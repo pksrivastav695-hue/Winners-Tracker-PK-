@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="Winners Tracker PK - Student Syllabus Tracker">
+  <title>Winners Tracker (PK)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Winners Tracker (PK)</h1>
+      <button id="themeToggle">Toggle Theme</button>
+    </header>
+    <main>
+      <section class="profile">
+        <h2>Student Profile</h2>
+        <input id="studentName" placeholder="Your Name">
+        <input id="studentClass" placeholder="Class">
+        <input id="studentBoard" placeholder="Board">
+        <input id="academicYear" placeholder="Academic Year">
+        <button id="saveProfile">Save Profile</button>
+      </section>
+      <section>
+        <h2>Subjects</h2>
+        <input id="subjectName" placeholder="Enter subject name">
+        <button id="addSubject">Add Subject</button>
+        <div id="subjects"></div>
+      </section>
+      <section>
+        <h2>Overall Progress</h2>
+        <progress id="overallProgress" value="0" max="100"></progress>
+        <span id="progressText">0%</span>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
