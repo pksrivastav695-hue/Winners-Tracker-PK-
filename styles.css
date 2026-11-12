@@ -88,3 +88,31 @@ body.light-mode .sidebar{background:#172235}body.light-mode .stat-card strong{co
 @media(max-width:1050px){.main-area{padding:0 25px}.sidebar{width:210px}.main-area{margin-left:210px}.exam-form{grid-template-columns:1fr 1fr}.exam-form button{grid-column:span 2}}
 @media(max-width:760px){.sidebar{position:static;width:auto;height:auto;padding:13px 16px;display:block;border-right:0;border-bottom:1px solid #263347}.brand{padding:0 4px 12px}.brand-mark{width:34px;height:37px}.nav-menu{display:flex;gap:5px;overflow-x:auto}.nav-link{white-space:nowrap;padding:9px 11px;font-size:11px}.nav-link span{font-size:15px}.side-label,.sidebar-bottom{display:none}.main-area{margin:0;padding:0 16px}.topbar{height:78px;margin-bottom:18px}.topbar h2{font-size:18px}.date-chip{display:none}.welcome-banner{padding:23px 20px}.welcome-banner h1{font-size:19px}.banner-seal{font-size:42px;margin:0 5px}.stats-grid{gap:9px}.stat-card{padding:13px;min-height:130px}.stat-card p{font-size:8px;letter-spacing:1px}.stat-card strong{font-size:24px}.content-grid{grid-template-columns:1fr}.subjects-grid{grid-template-columns:1fr}.exam-form{grid-template-columns:1fr 1fr}.exam-form button{grid-column:span 2}.exam-status{display:none}}
 @media(max-width:420px){.stats-grid{grid-template-columns:1fr}.stat-card{min-height:110px}.large-progress{gap:15px}.progress-ring{width:95px;height:95px}.login-card{padding:30px 22px}.exam-form{grid-template-columns:1fr}.exam-form button{grid-column:auto}.top-actions{gap:8px}}
+
+/* Enchanted study hall visual upgrade */
+body{background-image:radial-gradient(circle at 12% 18%,#d7b66d0b 0 1px,transparent 2px),radial-gradient(circle at 78% 32%,#d7b66d12 0 1px,transparent 2px),radial-gradient(ellipse at 80% 0%,#263b55 0,transparent 44%),linear-gradient(135deg,#0b1220,#111b2b 55%,#0b1421)}
+.login-card{position:relative;overflow:hidden;background:linear-gradient(145deg,#1d2a3e,#111b2a 70%);border-color:#9a7b43;box-shadow:0 24px 90px #000a,0 0 35px #d7b66d12}
+.login-card:before,.login-card:after{content:"✧";position:absolute;color:#d7b66d66;font-size:25px}.login-card:before{top:20px;left:24px}.login-card:after{right:24px;bottom:20px}
+.crest,.brand-mark{filter:drop-shadow(0 0 10px #d7b66d55);background:linear-gradient(145deg,#25354b,#111a28)}
+.welcome-banner{box-shadow:inset 0 0 50px #d7b66d0b,0 12px 35px #0002}
+.welcome-banner:before{content:"✦  ✧  ·  ✧  ✦";position:absolute;right:22%;top:18px;color:#e8d39a55;letter-spacing:14px;font-size:12px}
+.stat-card,.panel,.subject-card{box-shadow:0 8px 25px #0002;transition:transform .2s,border-color .2s,box-shadow .2s}
+.stat-card:hover,.subject-card:hover{transform:translateY(-3px);border-color:#8c754d;box-shadow:0 12px 30px #0004}
+.guild-panel{margin:18px 0 20px;padding:19px 21px;background:linear-gradient(120deg,#19283a,#172131);border:1px solid #655437;border-radius:13px;box-shadow:inset 0 0 35px #d7b66d08}
+.guild-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.guild-heading h3{font-family:Cinzel,Georgia,serif;margin:0;font-size:16px}
+.guild-heading p:last-child{font-size:11px;color:var(--muted);margin:5px 0 0}
+.guild-spark{font-size:30px;color:var(--gold)}
+.guild-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.guild-card{min-height:100px;border:1px solid #ffffff20;border-radius:9px;color:#f8f3e8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:.2s;position:relative;overflow:hidden}
+.guild-card:hover{transform:translateY(-3px);filter:brightness(1.13)}
+.guild-card.chosen{outline:2px solid var(--gold2);outline-offset:2px;box-shadow:0 0 22px #d7b66d35}
+.guild-card strong{font-family:Cinzel,serif;font-size:12px;letter-spacing:1.5px}
+.guild-card small{font-size:9px;color:#ffffffb8}
+.guild-symbol{font-size:24px;line-height:1.1}
+.ember{background:linear-gradient(145deg,#6d302c,#321d27)}.tide{background:linear-gradient(145deg,#285879,#172d49)}.grove{background:linear-gradient(145deg,#3b6347,#1d392f)}.aether{background:linear-gradient(145deg,#584577,#302744)}
+.guild-selected{font-size:10px;color:var(--gold2);margin:12px 0 0;text-align:right;letter-spacing:.5px}
+.exam-form-panel,.panel{border-color:#34445a}
+.exam-date{box-shadow:inset 0 0 15px #d7b66d0c}
+.primary-btn{box-shadow:0 4px 14px #b28b4930}
+@media(max-width:760px){.guild-grid{grid-template-columns:repeat(2,1fr)}.guild-panel{padding:16px}.guild-card{min-height:85px}}
