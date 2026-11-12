@@ -3,40 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111827">
-  <meta name="description" content="Winners Tracker PK - Student Syllabus Tracker">
-  <title>Winners Tracker (PK)</title>
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Winners Tracker PK - Your personal study dashboard">
+  <title>Winners Tracker | The Study Hall</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <div id="app">
-    <header>
-      <h1>Winners Tracker (PK)</h1>
-      <button id="themeToggle">Toggle Theme</button>
-    </header>
-    <main>
-      <section class="profile">
-        <h2>Student Profile</h2>
-        <input id="studentName" placeholder="Your Name">
-        <input id="studentClass" placeholder="Class">
-        <input id="studentBoard" placeholder="Board">
-        <input id="academicYear" placeholder="Academic Year">
-        <button id="saveProfile">Save Profile</button>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="crest">W</div>
+      <p class="eyebrow">YOUR PERSONAL STUDY HALL</p>
+      <h1>Winners Tracker</h1>
+      <p class="muted">A little progress every day adds up to magic.</p>
+      <form id="loginForm">
+        <label for="loginName">What should we call you?</label>
+        <input id="loginName" autocomplete="name" placeholder="Enter your name" required>
+        <label for="loginClass">Your class</label>
+        <input id="loginClass" placeholder="e.g. Class 10" required>
+        <button class="primary-btn full-btn" type="submit">Enter the Study Hall <span>✦</span></button>
+      </form>
+      <p class="tiny-note">Your progress is saved on this device.</p>
+    </div>
+  </div>
+
+  <div id="appShell" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">W</div><div><strong>WINNERS</strong><span>THE STUDY HALL</span></div></div>
+      <div class="side-label">YOUR SPACE</div>
+      <nav class="nav-menu">
+        <button class="nav-link active" data-page="overview"><span>⌂</span> Overview</button>
+        <button class="nav-link" data-page="syllabus"><span>▤</span> Syllabus Tracker</button>
+        <button class="nav-link" data-page="exams"><span>✧</span> Exam Datesheet</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="quote-mark">“</div>
+        <p>It is our choices that show what we truly are.</p>
+        <span>YOUR STUDY JOURNEY</span>
+        <button id="logoutBtn" class="logout-btn">↪ &nbsp; Switch profile</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div><p class="eyebrow" id="pageEyebrow">YOUR PROGRESS, YOUR PACE</p><h2 id="pageTitle">Overview</h2></div>
+        <div class="top-actions"><span class="date-chip" id="todayLabel"></span><button id="themeToggle" class="icon-btn" aria-label="Toggle theme">☾</button><div class="avatar" id="avatarInitial">S</div></div>
+      </header>
+
+      <section id="overviewPage" class="page">
+        <div class="welcome-banner">
+          <div><p class="eyebrow">WELCOME BACK</p><h1 id="welcomeTitle">Ready to make today count?</h1><p>Your next chapter starts with one small step.</p></div>
+          <div class="banner-seal">✦</div>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><span class="stat-icon">▤</span><p>CHAPTERS COMPLETED</p><strong id="completedStat">0</strong><small id="chapterTotal">of 0 chapters</small></article>
+          <article class="stat-card"><span class="stat-icon">◷</span><p>SYLLABUS PROGRESS</p><strong id="progressStat">0%</strong><div class="mini-track"><i id="progressBar"></i></div></article>
+          <article class="stat-card"><span class="stat-icon">✧</span><p>UPCOMING EXAMS</p><strong id="examStat">0</strong><small>scheduled exams ahead</small></article>
+        </div>
+        <div class="content-grid">
+          <section class="panel progress-panel"><div class="panel-heading"><div><p class="eyebrow">KEEP MOVING</p><h3>Your learning journey</h3></div><span class="gold-star">✦</span></div><div class="large-progress"><div class="progress-ring" id="progressRing"><div><strong id="ringPercent">0%</strong><span>COMPLETE</span></div></div><div><h4>Every chapter counts.</h4><p class="muted">Track each topic as you finish it. Consistency beats last-minute panic.</p><button class="text-btn" data-go="syllabus">Open syllabus tracker →</button></div></div></section>
+          <section class="panel upcoming-panel"><div class="panel-heading"><div><p class="eyebrow">MARK YOUR CALENDAR</p><h3>Next exams</h3></div><button class="text-btn" data-go="exams">View all →</button></div><div id="upcomingList" class="upcoming-list"><p class="empty-state">No exams added yet. Add your datesheet to see it here.</p></div></section>
+        </div>
       </section>
-      <section>
-        <h2>Subjects</h2>
-        <input id="subjectName" placeholder="Enter subject name">
-        <button id="addSubject">Add Subject</button>
-        <div id="subjects"></div>
+
+      <section id="syllabusPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">ONE TOPIC AT A TIME</p><h1>Your syllabus</h1><p class="muted">Add subjects, add chapters, and mark them complete as you learn.</p></div></div>
+        <div class="add-row"><input id="subjectName" placeholder="Enter a subject name (e.g. Science)"><button id="addSubject" class="primary-btn">+ Add subject</button></div>
+        <div id="subjects" class="subjects-grid"></div>
       </section>
-      <section>
-        <h2>Overall Progress</h2>
-        <progress id="overallProgress" value="0" max="100"></progress>
-        <span id="progressText">0%</span>
+
+      <section id="examsPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">BE READY, NOT RUSHED</p><h1>Exam datesheet</h1><p class="muted">Keep every test and exam in one place.</p></div></div>
+        <section class="panel exam-form-panel"><h3>Add an exam</h3><form id="examForm" class="exam-form"><input id="examName" placeholder="Exam name (e.g. Science)" required><input id="examSubject" placeholder="Subject / paper" required><input id="examDate" type="date" required><input id="examTime" type="time"><button class="primary-btn" type="submit">+ Add to datesheet</button></form></section>
+        <div class="panel"><div class="panel-heading"><div><p class="eyebrow">YOUR SCHEDULE</p><h3>All exams</h3></div><span class="count-pill" id="examCount">0 exams</span></div><div id="examList" class="exam-list"><p class="empty-state">Your datesheet is empty. Add your first exam above.</p></div></div>
       </section>
+      <footer class="footer-note">MADE FOR YOUR NEXT BIG WIN <span>✦</span></footer>
     </main>
   </div>
+  <div id="toast" class="toast" role="status"></div>
   <script src="app.js"></script>
 </body>
 </html>
