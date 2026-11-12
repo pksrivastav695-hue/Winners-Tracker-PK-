@@ -3,6 +3,7 @@ const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(k
 let subjects = read("subjects", []);
 let exams = read("wtExams", []);
 let profile = read("wtProfile", null);
+let selectedGuild = localStorage.getItem("wtGuild") || "";
 let toastTimer;
 
 function notify(message) {
@@ -29,6 +30,7 @@ function showApp() {
   $("avatarInitial").textContent = profile.name.charAt(0).toUpperCase();
   $("todayLabel").textContent = new Intl.DateTimeFormat("en-IN", {day:"numeric", month:"short", year:"numeric"}).format(new Date());
   showPage("overview");
+  renderGuild();
   renderSubjects();
   renderExams();
   updateDashboard();
@@ -44,6 +46,16 @@ function showPage(page) {
 }
 document.querySelectorAll(".nav-link").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.page)));
 document.querySelectorAll("[data-go]").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.go)));
+document.querySelectorAll("[data-guild]").forEach(btn => btn.addEventListener("click", () => {
+  selectedGuild = btn.dataset.guild;
+  localStorage.setItem("wtGuild", selectedGuild);
+  renderGuild();
+  notify(selectedGuild + " guild selected.");
+}));
+function renderGuild() {
+  document.querySelectorAll("[data-guild]").forEach(btn => btn.classList.toggle("chosen", btn.dataset.guild === selectedGuild));
+  $("guildSelected").textContent = selectedGuild ? "✦ Your guild: " + selectedGuild : "Choose a guild to personalise your study hall.";
+}
 
 $("loginForm").addEventListener("submit", event => {
   event.preventDefault();
