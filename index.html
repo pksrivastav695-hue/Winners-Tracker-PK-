@@ -14,19 +14,25 @@
 </head>
 <body>
   <div id="loginScreen" class="login-screen">
-    <div class="login-card">
+    <div class="login-card setup-card">
       <div class="crest">W</div>
       <p class="eyebrow">YOUR PERSONAL STUDY HALL</p>
       <h1>Winners Tracker</h1>
-      <p class="muted">A little progress every day adds up to magic.</p>
+      <p class="muted">Set up your study space. You can change these details later.</p>
       <form id="loginForm">
-        <label for="loginName">What should we call you?</label>
-        <input id="loginName" autocomplete="name" placeholder="Enter your name" required>
-        <label for="loginClass">Your class</label>
-        <input id="loginClass" placeholder="e.g. Class 10" required>
-        <button class="primary-btn full-btn" type="submit">Enter the Study Hall <span>✦</span></button>
+        <div class="setup-grid">
+          <div class="setup-field"><label for="loginName">Student name</label><input id="loginName" autocomplete="name" placeholder="Your name" required></div>
+          <div class="setup-field"><label for="loginClass">Class</label><select id="loginClass" required><option value="">Select class</option><option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option></select></div>
+          <div class="setup-field"><label for="schoolName">School name</label><input id="schoolName" placeholder="Your school"></div>
+          <div class="setup-field"><label for="boardName">Board</label><select id="boardName"><option value="">Select board</option><option>CBSE</option><option>ICSE</option><option>State Board</option><option>NIOS</option><option>Other</option></select></div>
+          <div class="setup-field" id="streamField" hidden><label for="studentStream">Class 11–12 stream</label><select id="studentStream"><option value="">Choose stream</option><option value="PCM">Science - PCM</option><option value="PCB">Science - PCB</option><option value="PCMB">Science - PCMB</option><option value="Commerce">Commerce</option><option value="Humanities">Humanities / Arts</option></select></div>
+        </div>
+        <div class="setup-field"><label>Contact details <span class="field-note">OTP sign-in will be connected after Firebase setup</span></label><input id="studentPhone" type="tel" inputmode="tel" placeholder="Phone number (optional)"><input id="studentEmail" type="email" placeholder="Email address (optional)"></div>
+        <div class="setup-field"><label>Choose your study modes</label><div class="mode-choices"><label><input type="checkbox" id="dailyMode" checked> Daily Study</label><label><input type="checkbox" id="examMode"> Exam Preparation</label></div><p class="field-note">You can use either mode or both. You can change this later.</p></div>
+        <div class="setup-field" id="targetExamField" hidden><label for="targetExamDate">Target exam date (optional)</label><input id="targetExamDate" type="date"></div>
+        <button class="primary-btn full-btn" type="submit">Create my study space <span>✦</span></button>
       </form>
-      <p class="tiny-note">Your progress is saved on this device.</p>
+      <p class="tiny-note">This first version saves your profile on this device. OTP authentication is not active yet.</p>
     </div>
   </div>
 
