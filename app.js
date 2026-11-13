@@ -113,7 +113,17 @@ $("logoutBtn").addEventListener("click", () => {
   $("loginScreen").classList.remove("hidden");
   $("appShell").classList.add("hidden");
   $("loginName").value = profile?.name || "";
-  $("loginClass").value = profile?.studentClass || "";\n  $("schoolName").value = profile?.school || "";\n  $("boardName").value = profile?.board || "";\n  $("studentPhone").value = profile?.phone || "";\n  $("studentEmail").value = profile?.email || "";\n  $("dailyMode").checked = profile?.modes?.daily ?? true;\n  $("examMode").checked = profile?.modes?.exam ?? false;\n  $("studentStream").value = profile?.stream || "";\n  $("streamField").hidden = Number(profile?.studentClass) < 11;\n  $("targetExamField").hidden = !profile?.modes?.exam;\n  $("targetExamDate").value = profile?.targetExamDate || "";
+  $("loginClass").value = profile?.studentClass || "";
+  $("schoolName").value = profile?.school || "";
+  $("boardName").value = profile?.board || "";
+  $("studentPhone").value = profile?.phone || "";
+  $("studentEmail").value = profile?.email || "";
+  $("dailyMode").checked = profile?.modes?.daily ?? true;
+  $("examMode").checked = profile?.modes?.exam ?? false;
+  $("studentStream").value = profile?.stream || "";
+  $("streamField").hidden = Number(profile?.studentClass) < 11;
+  $("targetExamField").hidden = !profile?.modes?.exam;
+  $("targetExamDate").value = profile?.targetExamDate || "";
 });
 
 $("addSubject").addEventListener("click", () => {
@@ -282,5 +292,15 @@ $("themeToggle").addEventListener("click",()=>{
 if(localStorage.getItem("wtLight")==="true") document.body.classList.add("light-mode");
 $("loginName").value = profile?.name || "";
 $("loginClass").value = profile?.studentClass || "";
+$("schoolName").value = profile?.school || "";
+$("boardName").value = profile?.board || "";
+$("studentPhone").value = profile?.phone || "";
+$("studentEmail").value = profile?.email || "";
+$("dailyMode").checked = profile?.modes?.daily ?? true;
+$("examMode").checked = profile?.modes?.exam ?? false;
+$("studentStream").value = profile?.stream || "";
+$("streamField").hidden = Number(profile?.studentClass) < 11;
+$("targetExamField").hidden = !profile?.modes?.exam;
+$("targetExamDate").value = profile?.targetExamDate || "";
 if(profile && profile.name && profile.studentClass) showApp();
 if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
