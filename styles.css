@@ -116,3 +116,19 @@ body{background-image:radial-gradient(circle at 12% 18%,#d7b66d0b 0 1px,transpar
 .exam-date{box-shadow:inset 0 0 15px #d7b66d0c}
 .primary-btn{box-shadow:0 4px 14px #b28b4930}
 @media(max-width:760px){.guild-grid{grid-template-columns:repeat(2,1fr)}.guild-panel{padding:16px}.guild-card{min-height:85px}}
+
+/* Student onboarding */
+.setup-card{width:min(100%,620px);text-align:left;max-height:92vh;overflow:auto}
+.setup-card>.crest,.setup-card>.eyebrow,.setup-card>h1,.setup-card>.muted{text-align:center}
+.setup-card form{gap:14px;margin-top:22px}
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.setup-field{display:grid;gap:7px}
+.setup-field label{font-size:12px;color:#d5c9b1}
+.setup-field input,.setup-field select{width:100%;background:#0d1624;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:12px}
+.setup-field select{color-scheme:dark}
+.field-note{font-size:10px;color:#8997a8;line-height:1.5}
+.mode-choices{display:flex;gap:12px;flex-wrap:wrap}
+.mode-choices label{display:flex;align-items:center;gap:7px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#0d1624}
+.mode-choices input{accent-color:#d7b66d}
+body.light-mode .setup-field input,body.light-mode .setup-field select,body.light-mode .mode-choices label{background:#fff;color:#202a36}
+@media(max-width:520px){.setup-card{padding:28px 20px}.setup-grid{grid-template-columns:1fr}.mode-choices{display:grid;grid-template-columns:1fr 1fr}}
