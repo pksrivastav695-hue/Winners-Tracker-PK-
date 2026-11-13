@@ -34,6 +34,8 @@ function showApp() {
   renderSubjects();
   renderExams();
   updateDashboard();
+  renderDailyTasks();
+  updateExamPrep();
 }
 
 const thoughtsByPage = {
@@ -57,6 +59,16 @@ const thoughtsByPage = {
     "Paper tumhari value decide nahi karta; preparation tumhara control hai.",
     "Stay calm, revise smart, and trust your practice.",
     "Har test feedback hai. Use it, then improve."
+  ],
+  daily: [
+    "Aaj ke 3 focused tasks, kal ke 30 random tasks se behtar hain.",
+    "Start small. Finish what you planned.",
+    "Discipline ka matlab perfect hona nahi, wapas track par aana hai."
+  ],
+  prep: [
+    "Exam ko ek din mein nahi, roz ke revision se jeeta jaata hai.",
+    "Plan clear ho to pressure manageable ho jaata hai.",
+    "Practice makes your preparation visible."
   ]
 };
 let thoughtBag = read("wtThoughtBag", []);
@@ -68,20 +80,31 @@ function showThought(page) {
   lastThought = thought;
   localStorage.setItem("wtLastThought", thought);
   $("thoughtText").textContent = thought;
-  $("thoughtLabel").textContent = page === "overview" ? "A NOTE FOR TODAY" : page === "syllabus" ? "A THOUGHT FOR YOUR LEARNING" : "A THOUGHT BEFORE THE EXAM";
+  const labels = {overview:"A NOTE FOR TODAY",daily:"A THOUGHT FOR YOUR DAILY QUEST",syllabus:"A THOUGHT FOR YOUR LEARNING",prep:"A THOUGHT FOR YOUR PREPARATION",exams:"A THOUGHT BEFORE THE EXAM"};
+  $("thoughtLabel").textContent = labels[page] || labels.overview;
 }
 
 function showPage(page) {
   document.querySelectorAll(".page").forEach(el => el.classList.add("hidden"));
-  $(page + "Page").classList.remove("hidden");
+  const target = $(page + "Page");
+  if (!target) return;
+  target.classList.remove("hidden");
   document.querySelectorAll(".nav-link").forEach(btn => btn.classList.toggle("active", btn.dataset.page === page));
-  const titles = {overview:"Overview", syllabus:"Syllabus Tracker", exams:"Exam Datesheet"};
-  const subtitles = {overview:"YOUR PROGRESS, YOUR PACE", syllabus:"BUILD YOUR PLAN", exams:"PLAN AHEAD"};
+  const titles = {overview:"Overview",daily:"Daily Study",syllabus:"Syllabus Tracker",prep:"Exam Preparation",exams:"Exam Datesheet"};
+  const subtitles = {overview:"YOUR PROGRESS, YOUR PACE",daily:"PLAN TODAY, ONE TASK AT A TIME",syllabus:"BUILD YOUR PLAN",prep:"PREPARE WITH A PLAN",exams:"PLAN AHEAD"};
   $("pageTitle").textContent = titles[page];
   $("pageEyebrow").textContent = subtitles[page];
   showThought(page);
+  if (page === "daily") renderDailyTasks();
+  if (page === "prep") updateExamPrep();
+  $("appShell").classList.remove("nav-open");
+  $("menuToggle").setAttribute("aria-expanded","false");
 }
 document.querySelectorAll(".nav-link").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.page)));
+$("menuToggle").addEventListener("click", () => {
+  const open = $("appShell").classList.toggle("nav-open");
+  $("menuToggle").setAttribute("aria-expanded", String(open));
+});
 document.querySelectorAll("[data-go]").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.go)));
 document.querySelectorAll("[data-guild]").forEach(btn => btn.addEventListener("click", () => {
   selectedGuild = btn.dataset.guild;
@@ -296,6 +319,51 @@ function renderExams() {
     list.append(row);
   });
 }
+function updateExamPrep() {
+  const total = subjects.reduce((sum,s)=>sum+s.chapters.length,0);
+  const done = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.done).length,0);
+  const pct = total ? Math.round(done/total*100) : 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = exams.filter(e=>new Date(e.date+"T00:00:00")>=today).sort((a,b)=>a.date.localeCompare(b.date));
+  $("prepProgress").textContent = pct + "%";
+  $("prepChapters").textContent = done + " of " + total + " chapters";
+  $("prepExamCount").textContent = upcoming.length;
+  if (!upcoming.length) {
+    $("prepNextExam").textContent = "Not set";
+    $("prepCountdown").textContent = "Add an exam date";
+  } else {
+    const next = upcoming[0], date = new Date(next.date+"T00:00:00");
+    const days = Math.ceil((date-today)/86400000);
+    $("prepNextExam").textContent = next.subject || next.name;
+    $("prepCountdown").textContent = days === 0 ? "Your exam is today" : days + " days remaining · " + formatDate(next.date);
+  }
+}
+let dailyTasks = read("wtDailyTasks", {});
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function renderDailyTasks() {
+  const key=todayKey(), tasks=dailyTasks[key] || [];
+  const list=$("dailyTasks"); if(!list) return;
+  list.innerHTML="";
+  $("dailyCount").textContent=tasks.filter(t=>t.done).length+" / "+tasks.length+" done";
+  const subjectSelect=$("dailySubject");
+  if(subjectSelect && subjectSelect.options.length<=1) subjects.forEach(s=>{const o=document.createElement("option");o.value=s.name;o.textContent=s.name;subjectSelect.append(o);});
+  if(!tasks.length){list.innerHTML='<p class="empty-state">No targets yet. Add the first small task.</p>';return;}
+  tasks.forEach((task,index)=>{
+    const row=document.createElement("label");row.className="daily-task"+(task.done?" is-done":"");
+    const check=document.createElement("input");check.type="checkbox";check.checked=!!task.done;
+    check.addEventListener("change",()=>{task.done=check.checked;dailyTasks[key]=tasks;localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));renderDailyTasks();});
+    const name=document.createElement("span");name.textContent=task.name;
+    const subject=document.createElement("small");subject.textContent=task.subject||"Personal target";
+    const del=document.createElement("button");del.type="button";del.className="subtle-btn";del.textContent="×";del.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();tasks.splice(index,1);dailyTasks[key]=tasks;localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));renderDailyTasks();});
+    row.append(check,name,subject,del);list.append(row);
+  });
+}
+$("dailyForm").addEventListener("submit",e=>{
+  e.preventDefault();const name=$("dailyTask").value.trim();if(!name)return;
+  const key=todayKey();dailyTasks[key]=dailyTasks[key]||[];
+  dailyTasks[key].push({name,subject:$("dailySubject").value,done:false});
+  localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));$("dailyForm").reset();renderDailyTasks();notify("Daily target added.");
+});
 function updateDashboard() {
   const total = subjects.reduce((sum,s)=>sum+s.chapters.length,0);
   const done = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.done).length,0);
@@ -307,6 +375,7 @@ function updateDashboard() {
   $("progressStat").textContent = percent + "%";
   $("progressBar").style.width = percent + "%";
   $("examStat").textContent = upcoming.length;
+  updateExamPrep();
   $("ringPercent").textContent = percent + "%";
   $("progressRing").style.setProperty("--progress", (percent*3.6) + "deg");
   const upcomingList = $("upcomingList");
