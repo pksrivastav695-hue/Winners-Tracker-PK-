@@ -34,7 +34,10 @@ function showApp() {
   showPage("overview");
   renderGuild();
   renderSubjects();
+  renderSubjectOverview();
+  populateRevisionSubjects();
   renderExams();
+  updateModeVisibility();
   updateDashboard();
   renderDailyTasks();
   updateExamPrep();
@@ -86,6 +89,13 @@ function showThought(page) {
   $("thoughtLabel").textContent = labels[page] || labels.overview;
 }
 
+function updateModeVisibility() {
+  const daily=profile?.modes?.daily!==false, exam=profile?.modes?.exam===true;
+  document.querySelectorAll('[data-page="daily"],[data-page="timer"]').forEach(el=>el.hidden=!daily);
+  document.querySelectorAll('[data-page="prep"],[data-page="exams"]').forEach(el=>el.hidden=!exam);
+  if(!daily&&["daily","timer"].includes(document.querySelector(".nav-link.active")?.dataset.page))showPage("overview");
+  if(!exam&&["prep","exams"].includes(document.querySelector(".nav-link.active")?.dataset.page))showPage("overview");
+}
 function showPage(page) {
   document.querySelectorAll(".page").forEach(el => el.classList.add("hidden"));
   const target = $(page + "Page");
@@ -488,9 +498,10 @@ function loadSettings(){
 }
 $("settingsForm").addEventListener("submit",e=>{
   e.preventDefault();const grade=$("settingsClass").value,stream=$("settingsStream").value;
+  if(! $("settingsDaily").checked && ! $("settingsExam").checked)return notify("Choose at least one study mode.");
   if(Number(grade)>=11&&!stream)return notify("Choose a stream for Class 11–12.");
   profile={...profile,name:$("settingsName").value.trim(),studentClass:grade,school:$("settingsSchool").value.trim(),board:$("settingsBoard").value.trim(),stream,modes:{daily:$("settingsDaily").checked,exam:$("settingsExam").checked}};
-  localStorage.setItem("wtProfile",JSON.stringify(profile));$("welcomeTitle").textContent="Welcome back, "+profile.name+".";$("avatarInitial").textContent=profile.name.charAt(0).toUpperCase();notify("Profile updated.");
+  localStorage.setItem("wtProfile",JSON.stringify(profile));$("welcomeTitle").textContent="Welcome back, "+profile.name+".";$("avatarInitial").textContent=profile.name.charAt(0).toUpperCase();updateModeVisibility();notify("Profile updated.");
 });
 $("reminderEnabled").addEventListener("change",()=>localStorage.setItem("wtReminderEnabled",String($("reminderEnabled").checked)));
 $("reminderTime").addEventListener("change",()=>localStorage.setItem("wtReminderTime",$("reminderTime").value));
