@@ -35,6 +35,42 @@ function showApp() {
   renderExams();
   updateDashboard();
 }
+
+const thoughtsByPage = {
+  overview: [
+    "Aaj ka chhota effort, kal ka bada result ban sakta hai.",
+    "You do not need a perfect day. You need a focused next hour.",
+    "Sapne bade rakho, par aaj ka target clear rakho.",
+    "Progress slow ho sakti hai, par rukni nahi chahiye.",
+    "Your future is shaped by what you practise today."
+  ],
+  syllabus: [
+    "Ek chapter at a time. Bas agla step complete karo.",
+    "Confusion learning ka end nahi, starting point hai.",
+    "Aaj jo samjha, wahi kal tumhari strength banega.",
+    "Consistency beats random bursts of hard work.",
+    "Ratta kam, samajh zyada. Build the foundation."
+  ],
+  exams: [
+    "Exam date pressure nahi, planning ka signal hai.",
+    "Preparation ka best time hamesha abhi hota hai.",
+    "Paper tumhari value decide nahi karta; preparation tumhara control hai.",
+    "Stay calm, revise smart, and trust your practice.",
+    "Har test feedback hai. Use it, then improve."
+  ]
+};
+let thoughtBag = read("wtThoughtBag", []);
+let lastThought = localStorage.getItem("wtLastThought") || "";
+function showThought(page) {
+  const pool = thoughtsByPage[page] || thoughtsByPage.overview;
+  const available = pool.filter(item => item !== lastThought);
+  const thought = available[Math.floor(Math.random() * available.length)] || pool[0];
+  lastThought = thought;
+  localStorage.setItem("wtLastThought", thought);
+  $("thoughtText").textContent = thought;
+  $("thoughtLabel").textContent = page === "overview" ? "A NOTE FOR TODAY" : page === "syllabus" ? "A THOUGHT FOR YOUR LEARNING" : "A THOUGHT BEFORE THE EXAM";
+}
+
 function showPage(page) {
   document.querySelectorAll(".page").forEach(el => el.classList.add("hidden"));
   $(page + "Page").classList.remove("hidden");
@@ -43,6 +79,7 @@ function showPage(page) {
   const subtitles = {overview:"YOUR PROGRESS, YOUR PACE", syllabus:"BUILD YOUR PLAN", exams:"PLAN AHEAD"};
   $("pageTitle").textContent = titles[page];
   $("pageEyebrow").textContent = subtitles[page];
+  showThought(page);
 }
 document.querySelectorAll(".nav-link").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.page)));
 document.querySelectorAll("[data-go]").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.go)));
@@ -303,4 +340,5 @@ $("streamField").hidden = Number(profile?.studentClass) < 11;
 $("targetExamField").hidden = !profile?.modes?.exam;
 $("targetExamDate").value = profile?.targetExamDate || "";
 if(profile && profile.name && profile.studentClass) showApp();
+else showThought("overview");
 if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
