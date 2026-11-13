@@ -70,6 +70,26 @@ const thoughtsByPage = {
     "Start small. Finish what you planned.",
     "Discipline ka matlab perfect hona nahi, wapas track par aana hai."
   ],
+  subjects: [
+    "Every subject becomes manageable when you break it into chapters.",
+    "A clear subject list turns a large syllabus into smaller steps."
+  ],
+  revision: [
+    "Revision turns short-term understanding into long-term memory.",
+    "A topic is not finished until you can recall it again."
+  ],
+  timer: [
+    "Protect your focus. One task, one session, one finish.",
+    "A focused 25 minutes can beat an hour of distraction."
+  ],
+  notifications: [
+    "A useful reminder is a plan asking for your attention.",
+    "Check your progress, then decide your next move."
+  ],
+  settings: [
+    "Build a system that supports the way you learn.",
+    "A good plan should fit your life, not fight it."
+  ],
   prep: [
     "Exam ko ek din mein nahi, roz ke revision se jeeta jaata hai.",
     "Plan clear ho to pressure manageable ho jaata hai.",
