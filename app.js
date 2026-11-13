@@ -16,6 +16,8 @@ function notify(message) {
 function saveSubjects() {
   localStorage.setItem("subjects", JSON.stringify(subjects));
   renderSubjects();
+  renderSubjectOverview();
+  populateRevisionSubjects();
   updateDashboard();
 }
 function saveExams() {
@@ -80,7 +82,7 @@ function showThought(page) {
   lastThought = thought;
   localStorage.setItem("wtLastThought", thought);
   $("thoughtText").textContent = thought;
-  const labels = {overview:"A NOTE FOR TODAY",daily:"A THOUGHT FOR YOUR DAILY QUEST",syllabus:"A THOUGHT FOR YOUR LEARNING",prep:"A THOUGHT FOR YOUR PREPARATION",exams:"A THOUGHT BEFORE THE EXAM"};
+  const labels = {overview:"A NOTE FOR TODAY",daily:"A THOUGHT FOR YOUR DAILY QUEST",syllabus:"A THOUGHT FOR YOUR LEARNING",prep:"A THOUGHT FOR YOUR PREPARATION",exams:"A THOUGHT BEFORE THE EXAM",subjects:"A NOTE FOR YOUR SUBJECTS",revision:"A NOTE FOR REVISION",timer:"A NOTE FOR FOCUS",notifications:"A NOTE FOR YOUR JOURNEY",settings:"A NOTE FOR YOUR STUDY SPACE"};
   $("thoughtLabel").textContent = labels[page] || labels.overview;
 }
 
@@ -90,13 +92,17 @@ function showPage(page) {
   if (!target) return;
   target.classList.remove("hidden");
   document.querySelectorAll(".nav-link").forEach(btn => btn.classList.toggle("active", btn.dataset.page === page));
-  const titles = {overview:"Overview",daily:"Daily Study",syllabus:"Syllabus Tracker",prep:"Exam Preparation",exams:"Exam Datesheet"};
-  const subtitles = {overview:"YOUR PROGRESS, YOUR PACE",daily:"PLAN TODAY, ONE TASK AT A TIME",syllabus:"BUILD YOUR PLAN",prep:"PREPARE WITH A PLAN",exams:"PLAN AHEAD"};
+  const titles = {overview:"Overview",daily:"Daily Study",syllabus:"Syllabus Tracker",prep:"Exam Preparation",exams:"Exam Datesheet",subjects:"Subjects",revision:"Revision Room",timer:"Study Timer",notifications:"Notifications",settings:"Settings"};
+  const subtitles = {overview:"YOUR PROGRESS, YOUR PACE",daily:"PLAN TODAY, ONE TASK AT A TIME",syllabus:"BUILD YOUR PLAN",prep:"PREPARE WITH A PLAN",exams:"PLAN AHEAD",subjects:"YOUR ACADEMIC MAP",revision:"REVISE AND RETAIN",timer:"FOCUS SESSION",notifications:"YOUR STUDY UPDATES",settings:"PERSONALISE YOUR SPACE"};
   $("pageTitle").textContent = titles[page];
   $("pageEyebrow").textContent = subtitles[page];
   showThought(page);
   if (page === "daily") renderDailyTasks();
   if (page === "prep") updateExamPrep();
+  if (page === "subjects") renderSubjectOverview();
+  if (page === "revision") renderRevisions();
+  if (page === "notifications") renderNotifications();
+  if (page === "settings") loadSettings();
   $("appShell").classList.remove("nav-open");
   $("menuToggle").setAttribute("aria-expanded","false");
 }
@@ -281,7 +287,7 @@ $("examForm").addEventListener("submit", event => {
   exams.sort((a,b) => (a.date + (a.time||"")).localeCompare(b.date + (b.time||"")));
   localStorage.setItem("wtExams", JSON.stringify(exams));
   $("examForm").reset();
-  renderExams(); updateDashboard(); notify("Exam added to your datesheet.");
+  renderExams(); updateDashboard(); addNotice("Exam added",subject+" was added to your datesheet."); notify("Exam added to your datesheet.");
 });
 function formatDate(date) {
   return new Intl.DateTimeFormat("en-IN",{day:"numeric",month:"short",year:"numeric"}).format(new Date(date+"T00:00:00"));
@@ -346,7 +352,7 @@ function renderDailyTasks() {
   list.innerHTML="";
   $("dailyCount").textContent=tasks.filter(t=>t.done).length+" / "+tasks.length+" done";
   const subjectSelect=$("dailySubject");
-  if(subjectSelect && subjectSelect.options.length<=1) subjects.forEach(s=>{const o=document.createElement("option");o.value=s.name;o.textContent=s.name;subjectSelect.append(o);});
+  if(subjectSelect){const current=subjectSelect.value;subjectSelect.innerHTML='<option value="">Subject (optional)</option>';subjects.forEach(s=>{const o=document.createElement("option");o.value=s.name;o.textContent=s.name;subjectSelect.append(o);});subjectSelect.value=current;}
   if(!tasks.length){list.innerHTML='<p class="empty-state">No targets yet. Add the first small task.</p>';return;}
   tasks.forEach((task,index)=>{
     const row=document.createElement("label");row.className="daily-task"+(task.done?" is-done":"");
@@ -391,6 +397,128 @@ function updateDashboard() {
     });
   }
 }
+
+/* Additional study tools */
+let revisions = read("wtRevisions", []);
+let notices = read("wtNotifications", []);
+function addNotice(title, message) {
+  notices.unshift({id:Date.now()+Math.random(),title,message,created:new Date().toISOString(),read:false});
+  notices=notices.slice(0,40); localStorage.setItem("wtNotifications",JSON.stringify(notices)); updateNotificationBadge();
+}
+function updateNotificationBadge() {
+  const badge=$("notificationBadge"); if(!badge)return;
+  const unread=notices.filter(n=>!n.read).length; badge.textContent=unread; badge.hidden=!unread;
+}
+function renderNotifications() {
+  const list=$("notificationList"); if(!list)return; list.innerHTML="";
+  if(!notices.length){list.innerHTML='<p class="empty-state">No notifications yet. Your study updates will appear here.</p>';return;}
+  notices.forEach(n=>{
+    const item=document.createElement("article");item.className="notice-row"+(n.read?" read":"");
+    const copy=document.createElement("div");const title=document.createElement("strong");title.textContent=n.title;
+    const msg=document.createElement("p");msg.textContent=n.message;
+    const time=document.createElement("small");time.textContent=new Date(n.created).toLocaleString("en-IN");
+    copy.append(title,msg,time);const mark=document.createElement("button");mark.className="text-btn";mark.textContent=n.read?"Read":"Mark read";
+    mark.addEventListener("click",()=>{n.read=true;localStorage.setItem("wtNotifications",JSON.stringify(notices));renderNotifications();updateNotificationBadge();});
+    item.append(copy,mark);list.append(item);
+  });
+}
+$("clearNotifications").addEventListener("click",()=>{notices=[];localStorage.setItem("wtNotifications","[]");renderNotifications();updateNotificationBadge();});
+$("notificationQuick").addEventListener("click",()=>showPage("notifications"));
+function renderSubjectOverview() {
+  const wrap=$("subjectOverview");if(!wrap)return;wrap.innerHTML="";
+  if(!subjects.length){wrap.innerHTML='<div class="empty-card"><h3>No subjects yet</h3><p>Add subjects in the Syllabus Tracker.</p></div>';return;}
+  subjects.forEach(sub=>{
+    const total=sub.chapters.length,done=sub.chapters.filter(c=>c.done).length;
+    const card=document.createElement("article");card.className="subject-card";
+    const title=document.createElement("h3");title.textContent=sub.name;
+    const meta=document.createElement("p");meta.className="muted";meta.textContent=done+" / "+total+" chapters completed";
+    const track=document.createElement("div");track.className="subject-track";const fill=document.createElement("i");fill.style.width=(total?done/total*100:0)+"%";track.append(fill);
+    const open=document.createElement("button");open.className="text-btn";open.textContent="Manage chapters →";open.addEventListener("click",()=>showPage("syllabus"));
+    card.append(title,meta,track,open);wrap.append(card);
+  });
+}
+function populateRevisionSubjects() {
+  const sel=$("revisionSubject");if(!sel)return;const current=sel.value;sel.innerHTML='<option value="">Choose subject</option>';
+  subjects.forEach(sub=>{const o=document.createElement("option");o.value=sub.name;o.textContent=sub.name;sel.append(o);});sel.value=current;
+  populateRevisionChapters();
+}
+function populateRevisionChapters() {
+  const subject=$("revisionSubject")?.value,sel=$("revisionChapter");if(!sel)return;sel.innerHTML='<option value="">Choose chapter</option>';
+  const found=subjects.find(s=>s.name===subject);
+  (found?.chapters||[]).forEach(ch=>{const o=document.createElement("option");o.value=ch.name;o.textContent=ch.name;sel.append(o);});
+}
+$("revisionSubject").addEventListener("change",populateRevisionChapters);
+$("revisionForm").addEventListener("submit",e=>{
+  e.preventDefault();const subject=$("revisionSubject").value,chapter=$("revisionChapter").value,date=$("revisionDate").value;
+  if(!subject||!chapter||!date)return;
+  revisions.push({id:Date.now(),subject,chapter,date,done:false});localStorage.setItem("wtRevisions",JSON.stringify(revisions));
+  $("revisionForm").reset();populateRevisionSubjects();renderRevisions();addNotice("Revision scheduled",chapter+" ("+subject+") is scheduled for "+formatDate(date)+".");notify("Revision scheduled.");
+});
+function renderRevisions() {
+  const list=$("revisionList");if(!list)return;list.innerHTML="";
+  revisions.sort((a,b)=>a.date.localeCompare(b.date));
+  $("revisionCount").textContent=revisions.filter(r=>!r.done).length+" pending";
+  if(!revisions.length){list.innerHTML='<p class="empty-state">No revision tasks scheduled.</p>';return;}
+  revisions.forEach(r=>{
+    const row=document.createElement("div");row.className="revision-row"+(r.done?" read":"");
+    const check=document.createElement("input");check.type="checkbox";check.checked=r.done;check.addEventListener("change",()=>{r.done=check.checked;localStorage.setItem("wtRevisions",JSON.stringify(revisions));renderRevisions();});
+    const info=document.createElement("div");const name=document.createElement("strong");name.textContent=r.chapter;const meta=document.createElement("small");meta.textContent=r.subject+" · "+formatDate(r.date);info.append(name,meta);
+    const del=document.createElement("button");del.className="subtle-btn";del.textContent="×";del.addEventListener("click",()=>{revisions=revisions.filter(x=>x.id!==r.id);localStorage.setItem("wtRevisions",JSON.stringify(revisions));renderRevisions();});
+    row.append(check,info,del);list.append(row);
+  });
+}
+let timerSeconds=25*60,timerRemaining=timerSeconds,timerInterval=null;
+function paintTimer(){const m=String(Math.floor(timerRemaining/60)).padStart(2,"0"),sec=String(timerRemaining%60).padStart(2,"0");$("timerDisplay").textContent=m+":"+sec;}
+document.querySelectorAll("[data-minutes]").forEach(btn=>btn.addEventListener("click",()=>{
+  clearInterval(timerInterval);timerInterval=null;timerSeconds=Number(btn.dataset.minutes)*60;timerRemaining=timerSeconds;paintTimer();
+  document.querySelectorAll(".timer-preset").forEach(b=>b.classList.toggle("active",b===btn));$("timerStatus").textContent="Session ready.";
+}));
+$("timerStart").addEventListener("click",()=>{
+  if(timerInterval)return;$("timerStatus").textContent="Focus session running.";
+  timerInterval=setInterval(()=>{timerRemaining--;paintTimer();if(timerRemaining<=0){clearInterval(timerInterval);timerInterval=null;timerRemaining=0;paintTimer();$("timerStatus").textContent="Session complete. Take a short break.";addNotice("Focus session complete","You completed a study timer session.");notify("Focus session complete.");}},1000);
+});
+$("timerPause").addEventListener("click",()=>{clearInterval(timerInterval);timerInterval=null;$("timerStatus").textContent="Session paused.";});
+$("timerReset").addEventListener("click",()=>{clearInterval(timerInterval);timerInterval=null;timerRemaining=timerSeconds;paintTimer();$("timerStatus").textContent="Timer reset.";});
+function loadSettings(){
+  $("settingsName").value=profile?.name||"";$("settingsClass").value=profile?.studentClass||"10";$("settingsSchool").value=profile?.school||"";
+  $("settingsBoard").value=profile?.board||"";$("settingsStream").value=profile?.stream||"";
+  $("settingsDaily").checked=profile?.modes?.daily??true;$("settingsExam").checked=profile?.modes?.exam??false;
+  $("reminderEnabled").checked=localStorage.getItem("wtReminderEnabled")==="true";$("reminderTime").value=localStorage.getItem("wtReminderTime")||"19:00";
+  $("notificationPermission").textContent="Browser permission: "+("Notification" in window?Notification.permission:"not supported in this browser")+". Daily reminders are checked while this app is open.";
+}
+$("settingsForm").addEventListener("submit",e=>{
+  e.preventDefault();const grade=$("settingsClass").value,stream=$("settingsStream").value;
+  if(Number(grade)>=11&&!stream)return notify("Choose a stream for Class 11–12.");
+  profile={...profile,name:$("settingsName").value.trim(),studentClass:grade,school:$("settingsSchool").value.trim(),board:$("settingsBoard").value.trim(),stream,modes:{daily:$("settingsDaily").checked,exam:$("settingsExam").checked}};
+  localStorage.setItem("wtProfile",JSON.stringify(profile));$("welcomeTitle").textContent="Welcome back, "+profile.name+".";$("avatarInitial").textContent=profile.name.charAt(0).toUpperCase();notify("Profile updated.");
+});
+$("reminderEnabled").addEventListener("change",()=>localStorage.setItem("wtReminderEnabled",String($("reminderEnabled").checked)));
+$("reminderTime").addEventListener("change",()=>localStorage.setItem("wtReminderTime",$("reminderTime").value));
+$("enableNotifications").addEventListener("click",async()=>{
+  if(!("Notification" in window))return notify("Browser notifications are not supported.");
+  const permission=await Notification.requestPermission();$("notificationPermission").textContent="Browser permission: "+permission+". Daily reminders are checked while this app is open.";notify("Notification permission: "+permission);
+});
+function checkDailyReminder(){
+  if(localStorage.getItem("wtReminderEnabled")!=="true"||!("Notification" in window)||Notification.permission!=="granted")return;
+  const now=new Date(),time=localStorage.getItem("wtReminderTime")||"19:00",today=now.toLocaleDateString("en-CA");
+  if(now.toTimeString().slice(0,5)===time&&localStorage.getItem("wtReminderSent")!==today){
+    new Notification("Winners Tracker",{body:"Your daily study plan is waiting. Open the app and review today's targets."});
+    localStorage.setItem("wtReminderSent",today);addNotice("Daily study reminder","Your daily study plan is waiting.");
+  }
+}
+setInterval(checkDailyReminder,30000);
+$("exportData").addEventListener("click",()=>{
+  const data={profile,subjects,exams,dailyTasks,revisions,notices,guild:selectedGuild};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="winners-tracker-backup.json";a.click();URL.revokeObjectURL(url);notify("Backup exported.");
+});
+$("resetData").addEventListener("click",()=>{
+  if(!confirm("This will permanently clear this browser's Winners Tracker data. Export a backup first if needed. Continue?"))return;
+  ["wtProfile","subjects","wtExams","wtDailyTasks","wtRevisions","wtNotifications","wtGuild","wtThoughtBag","wtLastThought","wtReminderEnabled","wtReminderTime","wtReminderSent"].forEach(k=>localStorage.removeItem(k));
+  location.reload();
+});
+updateNotificationBadge();
+
 $("themeToggle").addEventListener("click",()=>{
   document.body.classList.toggle("light-mode");
   localStorage.setItem("wtLight",document.body.classList.contains("light-mode"));
