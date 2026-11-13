@@ -57,20 +57,63 @@ function renderGuild() {
   $("guildSelected").textContent = selectedGuild ? "✦ Your guild: " + selectedGuild : "Choose a guild to personalise your study hall.";
 }
 
+function subjectsForSetup(studentClass, stream) {
+  const grade = Number(studentClass);
+  if (grade >= 11) {
+    const choices = {
+      PCM:["Physics","Chemistry","Mathematics","English"],
+      PCB:["Physics","Chemistry","Biology","English"],
+      PCMB:["Physics","Chemistry","Mathematics","Biology","English"],
+      Commerce:["Accountancy","Business Studies","Economics","English"],
+      Humanities:["History","Political Science","Geography","English"]
+    };
+    return choices[stream] || [];
+  }
+  const common = ["English","Mathematics","Science","Social Science"];
+  if (grade <= 8) return ["English","Hindi","Mathematics","Science","Social Science"];
+  return [...common,"Hindi"];
+}
+$("loginClass").addEventListener("change", () => {
+  const senior = Number($("loginClass").value) >= 11;
+  $("streamField").hidden = !senior;
+  if (!senior) $("studentStream").value = "";
+});
+$("examMode").addEventListener("change", () => {
+  $("targetExamField").hidden = !$("examMode").checked;
+});
 $("loginForm").addEventListener("submit", event => {
   event.preventDefault();
   const name = $("loginName").value.trim();
-  const studentClass = $("loginClass").value.trim();
-  if (!name || !studentClass) return;
-  profile = {name, studentClass};
+  const studentClass = $("loginClass").value;
+  const stream = $("studentStream").value;
+  const dailyMode = $("dailyMode").checked;
+  const examMode = $("examMode").checked;
+  if (!name || !studentClass) return notify("Enter your name and class.");
+  if (!dailyMode && !examMode) return notify("Choose at least one study mode.");
+  if (Number(studentClass) >= 11 && !stream) return notify("Choose your stream first.");
+  profile = {
+    name, studentClass, school:$("schoolName").value.trim(),
+    board:$("boardName").value, stream,
+    phone:$("studentPhone").value.trim(), email:$("studentEmail").value.trim(),
+    modes:{daily:dailyMode,exam:examMode}, targetExamDate:$("targetExamDate").value
+  };
   localStorage.setItem("wtProfile", JSON.stringify(profile));
+  if (!subjects.length) {
+    subjects = subjectsForSetup(studentClass,stream).map(name => ({name,chapters:[]}));
+    localStorage.setItem("subjects",JSON.stringify(subjects));
+  }
+  if (examMode && profile.targetExamDate && !exams.some(e=>e.name==="Target Exam")) {
+    exams.push({id:Date.now(),name:"Target Exam",subject:"All subjects",date:profile.targetExamDate,time:""});
+    localStorage.setItem("wtExams",JSON.stringify(exams));
+  }
   showApp();
 });
+
 $("logoutBtn").addEventListener("click", () => {
   $("loginScreen").classList.remove("hidden");
   $("appShell").classList.add("hidden");
   $("loginName").value = profile?.name || "";
-  $("loginClass").value = profile?.studentClass || "";
+  $("loginClass").value = profile?.studentClass || "";\n  $("schoolName").value = profile?.school || "";\n  $("boardName").value = profile?.board || "";\n  $("studentPhone").value = profile?.phone || "";\n  $("studentEmail").value = profile?.email || "";\n  $("dailyMode").checked = profile?.modes?.daily ?? true;\n  $("examMode").checked = profile?.modes?.exam ?? false;\n  $("studentStream").value = profile?.stream || "";\n  $("streamField").hidden = Number(profile?.studentClass) < 11;\n  $("targetExamField").hidden = !profile?.modes?.exam;\n  $("targetExamDate").value = profile?.targetExamDate || "";
 });
 
 $("addSubject").addEventListener("click", () => {
