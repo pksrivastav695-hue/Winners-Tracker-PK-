@@ -47,6 +47,11 @@
         <button class="nav-link" data-page="syllabus"><span>▤</span> Syllabus Tracker</button>
         <button class="nav-link" data-page="prep"><span>⚑</span> Exam Preparation</button>
         <button class="nav-link" data-page="exams"><span>✧</span> Exam Datesheet</button>
+        <button class="nav-link" data-page="subjects"><span>✥</span> Subjects</button>
+        <button class="nav-link" data-page="revision"><span>↻</span> Revision</button>
+        <button class="nav-link" data-page="timer"><span>◴</span> Study Timer</button>
+        <button class="nav-link" data-page="notifications"><span>♧</span> Notifications <i id="notificationBadge" class="nav-badge" hidden>0</i></button>
+        <button class="nav-link" data-page="settings"><span>⚙</span> Settings</button>
       </nav>
       <div class="sidebar-bottom">
         <div class="quote-mark">“</div>
@@ -59,7 +64,7 @@
     <main class="main-area">
       <header class="topbar">
         <div><p class="eyebrow" id="pageEyebrow">YOUR PROGRESS, YOUR PACE</p><h2 id="pageTitle">Overview</h2></div>
-        <div class="top-actions"><span class="date-chip" id="todayLabel"></span><button id="themeToggle" class="icon-btn" aria-label="Toggle theme">☾</button><div class="avatar" id="avatarInitial">S</div></div>
+        <div class="top-actions"><span class="date-chip" id="todayLabel"></span><button id="themeToggle" class="icon-btn" aria-label="Toggle theme">☾</button><button id="notificationQuick" class="icon-btn" aria-label="Open notifications">♧</button><div class="avatar" id="avatarInitial">S</div></div>
       </header>
       <section class="thought-card" aria-live="polite" aria-label="Motivational thought">
         <div class="thought-emblem" aria-hidden="true">✦</div>
@@ -121,6 +126,41 @@
         <div class="section-intro"><div><p class="eyebrow">BE READY, NOT RUSHED</p><h1>Exam datesheet</h1><p class="muted">Keep every test and exam in one place.</p></div></div>
         <section class="panel exam-form-panel"><h3>Add an exam</h3><form id="examForm" class="exam-form"><input id="examName" placeholder="Exam name (e.g. Science)" required><input id="examSubject" placeholder="Subject / paper" required><input id="examDate" type="date" required><input id="examTime" type="time"><button class="primary-btn" type="submit">+ Add to datesheet</button></form></section>
         <div class="panel"><div class="panel-heading"><div><p class="eyebrow">YOUR SCHEDULE</p><h3>All exams</h3></div><span class="count-pill" id="examCount">0 exams</span></div><div id="examList" class="exam-list"><p class="empty-state">Your datesheet is empty. Add your first exam above.</p></div></div>
+      </section>
+      <section id="subjectsPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">YOUR ACADEMIC MAP</p><h1>Subjects</h1><p class="muted">Manage your subjects here. Add chapters in the Syllabus Tracker.</p></div></div>
+        <div id="subjectOverview" class="subjects-grid"></div>
+      </section>
+      <section id="revisionPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">MAKE KNOWLEDGE STICK</p><h1>Revision Room</h1><p class="muted">Schedule a revision date for any chapter and mark each revision when done.</p></div></div>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">REVISION PLAN</p><h3>Add a revision task</h3></div><span class="count-pill" id="revisionCount">0 pending</span></div>
+          <form id="revisionForm" class="revision-form"><select id="revisionSubject" required><option value="">Choose subject</option></select><select id="revisionChapter" required><option value="">Choose chapter</option></select><input id="revisionDate" type="date" required><button class="primary-btn" type="submit">+ Schedule revision</button></form>
+          <div id="revisionList" class="revision-list"><p class="empty-state">No revision tasks scheduled.</p></div>
+        </section>
+      </section>
+      <section id="timerPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">FOCUS WITHOUT DISTRACTION</p><h1>Study Timer</h1><p class="muted">Use a simple focus session. Your timer runs while this page stays open.</p></div></div>
+        <section class="panel timer-panel"><p class="eyebrow">FOCUS SESSION</p><div id="timerDisplay" class="timer-display">25:00</div>
+          <div class="timer-presets"><button class="timer-preset active" data-minutes="25">25 min</button><button class="timer-preset" data-minutes="45">45 min</button><button class="timer-preset" data-minutes="60">60 min</button></div>
+          <div class="timer-actions"><button id="timerStart" class="primary-btn">Start</button><button id="timerPause" class="secondary-btn">Pause</button><button id="timerReset" class="secondary-btn">Reset</button></div>
+          <p id="timerStatus" class="muted">Choose a session and press Start.</p>
+        </section>
+      </section>
+      <section id="notificationsPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">IMPORTANT UPDATES</p><h1>Notification Centre</h1><p class="muted">Your in-app reminders and study updates appear here.</p></div></div>
+        <section class="panel"><div class="panel-heading"><h3>Recent notifications</h3><button id="clearNotifications" class="text-btn">Clear all</button></div><div id="notificationList" class="notification-list"><p class="empty-state">No notifications yet.</p></div></section>
+      </section>
+      <section id="settingsPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">MAKE THIS SPACE YOURS</p><h1>Settings</h1><p class="muted">Update your profile, study modes and reminder preferences.</p></div></div>
+        <section class="panel settings-panel"><h3>Student profile</h3><form id="settingsForm" class="settings-form">
+          <label>Student name<input id="settingsName" required></label><label>Class<select id="settingsClass"><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></label>
+          <label>School<input id="settingsSchool"></label><label>Board<input id="settingsBoard"></label>
+          <label>Stream (Class 11–12)<select id="settingsStream"><option value="">Not applicable</option><option value="PCM">Science - PCM</option><option value="PCB">Science - PCB</option><option value="PCMB">Science - PCMB</option><option value="Commerce">Commerce</option><option value="Humanities">Humanities / Arts</option></select></label>
+          <div class="settings-modes"><span>Study modes</span><label><input type="checkbox" id="settingsDaily"> Daily Study</label><label><input type="checkbox" id="settingsExam"> Exam Preparation</label></div>
+          <button class="primary-btn" type="submit">Save profile</button>
+        </form></section>
+        <section class="panel settings-panel"><h3>Reminder preferences</h3><label class="setting-check"><input type="checkbox" id="reminderEnabled"> Enable daily browser reminder</label><label>Reminder time<input type="time" id="reminderTime" value="19:00"></label><button id="enableNotifications" class="secondary-btn">Allow browser notifications</button><p id="notificationPermission" class="field-note">Browser notifications require permission. They work only when supported by your browser.</p></section>
+        <section class="panel settings-panel"><h3>Data and appearance</h3><p class="muted">Your current profile, chapters and plans are saved in this browser on this device.</p><button id="exportData" class="secondary-btn">Export my data</button><button id="resetData" class="danger-btn">Reset all app data</button></section>
       </section>
       <footer class="footer-note">MADE FOR YOUR NEXT BIG WIN <span>✦</span></footer>
     </main>
