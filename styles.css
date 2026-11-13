@@ -155,3 +155,31 @@ body{background-color:#0c1119;background-image:linear-gradient(115deg,rgba(7,12,
 .guild-symbol{font-size:25px;text-shadow:0 2px 8px #0008}
 .stat-card,.panel,.subject-card{background:rgba(19,29,42,.96);backdrop-filter:blur(5px)}
 @media(max-width:760px){body{background-attachment:scroll}.thought-card{padding:13px 14px;margin-bottom:15px}.thought-text{font-size:13px}.welcome-banner{min-height:155px;background-position:58% center}.section-intro{padding:18px}}
+
+
+/* Distinct app pages and a proper mobile navigation drawer */
+.menu-toggle{display:none;border:1px solid #806a45;background:#172334;color:#ead7ad;border-radius:8px;padding:10px 12px;font-size:15px}
+.menu-toggle span{font-size:9px;letter-spacing:1.5px;margin-left:5px}
+.daily-form{display:grid;grid-template-columns:1fr 180px auto;gap:10px;margin-bottom:18px}
+.daily-form select{background:#0d1624;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:12px}
+.daily-tasks{display:grid;gap:8px}
+.daily-task{display:grid;grid-template-columns:20px 1fr auto 32px;align-items:center;gap:10px;padding:13px;border:1px solid var(--line);border-radius:9px;background:#111d2b;color:var(--text);font-size:12px}
+.daily-task input{accent-color:#d7b66d;width:16px;height:16px}
+.daily-task small{color:var(--muted);font-size:10px}
+.daily-task.is-done span{text-decoration:line-through;color:#89949f}
+.prep-hint{font-size:12px;line-height:1.7;margin:0 0 18px}
+@media(max-width:760px){
+  .sidebar{position:fixed;inset:0 auto 0 0;width:min(82vw,310px);height:100dvh;padding:20px 17px;display:flex;flex-direction:column;transform:translateX(-105%);transition:transform .25s ease;z-index:30;background:#090f19;box-shadow:12px 0 40px #0008}
+  .app-shell.nav-open .sidebar{transform:translateX(0)}
+  .menu-toggle{display:inline-flex;align-items:center;position:fixed;top:19px;left:14px;z-index:20}
+  .brand{padding:0 4px 28px 92px;min-height:48px}
+  .side-label{display:block}
+  .nav-menu{display:grid;gap:7px;overflow:visible}
+  .nav-link{padding:14px;font-size:13px}
+  .sidebar-bottom{display:block;margin-top:auto}
+  .main-area{margin:0;padding:0 16px}
+  .topbar{padding-left:92px}
+  .daily-form{grid-template-columns:1fr}
+  .daily-task{grid-template-columns:20px 1fr 32px}
+  .daily-task small{grid-column:2}
+}
