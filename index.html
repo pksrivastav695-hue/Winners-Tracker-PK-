@@ -39,10 +39,13 @@
   <div id="appShell" class="app-shell hidden">
     <aside class="sidebar">
       <div class="brand"><div class="brand-mark">W</div><div><strong>WINNERS</strong><span>THE STUDY HALL</span></div></div>
+      <button id="menuToggle" class="menu-toggle" aria-label="Open navigation" aria-expanded="false">☰ <span>MENU</span></button>
       <div class="side-label">YOUR SPACE</div>
-      <nav class="nav-menu">
+      <nav class="nav-menu" id="mainNav">
         <button class="nav-link active" data-page="overview"><span>⌂</span> Overview</button>
+        <button class="nav-link" data-page="daily"><span>◷</span> Daily Study</button>
         <button class="nav-link" data-page="syllabus"><span>▤</span> Syllabus Tracker</button>
+        <button class="nav-link" data-page="prep"><span>⚑</span> Exam Preparation</button>
         <button class="nav-link" data-page="exams"><span>✧</span> Exam Datesheet</button>
       </nav>
       <div class="sidebar-bottom">
@@ -87,6 +90,25 @@
           <section class="panel progress-panel"><div class="panel-heading"><div><p class="eyebrow">KEEP MOVING</p><h3>Your learning journey</h3></div><span class="gold-star">✦</span></div><div class="large-progress"><div class="progress-ring" id="progressRing"><div><strong id="ringPercent">0%</strong><span>COMPLETE</span></div></div><div><h4>Every chapter counts.</h4><p class="muted">Track each topic as you finish it. Consistency beats last-minute panic.</p><button class="text-btn" data-go="syllabus">Open syllabus tracker →</button></div></div></section>
           <section class="panel upcoming-panel"><div class="panel-heading"><div><p class="eyebrow">MARK YOUR CALENDAR</p><h3>Next exams</h3></div><button class="text-btn" data-go="exams">View all →</button></div><div id="upcomingList" class="upcoming-list"><p class="empty-state">No exams added yet. Add your datesheet to see it here.</p></div></section>
         </div>
+      </section>
+
+      <section id="dailyPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">YOUR DAILY QUEST</p><h1>Daily Study</h1><p class="muted">Set today's targets and mark each one when it is complete.</p></div></div>
+        <section class="panel daily-panel">
+          <div class="panel-heading"><div><p class="eyebrow">TODAY'S PLAN</p><h3>Study targets</h3></div><span class="count-pill" id="dailyCount">0 targets</span></div>
+          <form id="dailyForm" class="daily-form"><input id="dailyTask" placeholder="Add a target (e.g. Revise Light chapter)" required><select id="dailySubject"><option value="">Subject (optional)</option></select><button class="primary-btn" type="submit">+ Add target</button></form>
+          <div id="dailyTasks" class="daily-tasks"><p class="empty-state">No targets yet. Add the first small task.</p></div>
+        </section>
+      </section>
+
+      <section id="prepPage" class="page hidden">
+        <div class="section-intro"><div><p class="eyebrow">PREPARE WITH A PLAN</p><h1>Exam Preparation</h1><p class="muted">See your upcoming exam, countdown and syllabus progress together.</p></div></div>
+        <div class="stats-grid prep-stats">
+          <article class="stat-card"><span class="stat-icon">⌛</span><p>NEXT EXAM</p><strong id="prepNextExam">Not set</strong><small id="prepCountdown">Add an exam date</small></article>
+          <article class="stat-card"><span class="stat-icon">▤</span><p>SYLLABUS COMPLETE</p><strong id="prepProgress">0%</strong><small id="prepChapters">0 of 0 chapters</small></article>
+          <article class="stat-card"><span class="stat-icon">✦</span><p>UPCOMING PAPERS</p><strong id="prepExamCount">0</strong><small>in your datesheet</small></article>
+        </div>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">YOUR NEXT STEP</p><h3>Preparation checklist</h3></div><button class="text-btn" data-go="syllabus">Open syllabus →</button></div><p class="muted prep-hint">Complete chapters in the Syllabus Tracker and add every paper in the Exam Datesheet. This page brings that progress together.</p><button class="primary-btn" data-go="exams">Open exam datesheet</button></section>
       </section>
 
       <section id="syllabusPage" class="page hidden">
