@@ -169,6 +169,11 @@ function subjectsForSetup(studentClass, stream) {
   if (grade <= 8) return ["English","Hindi","Mathematics","Science","Social Science"];
   return [...common,"Hindi"];
 }
+$("boardName").addEventListener("change", () => {
+  const isState = $("boardName").value === "State Board";
+  $("stateField").hidden = !isState;
+  if (!isState) $("studentState").value = "";
+});
 $("loginClass").addEventListener("change", () => {
   const senior = Number($("loginClass").value) >= 11;
   $("streamField").hidden = !senior;
@@ -189,7 +194,7 @@ $("loginForm").addEventListener("submit", event => {
   if (Number(studentClass) >= 11 && !stream) return notify("Choose your stream first.");
   profile = {
     name, studentClass, school:$("schoolName").value.trim(),
-    board:$("boardName").value, stream,
+    board:$("boardName").value, state:$("studentState").value, stream,
     phone:$("studentPhone").value.trim(), email:$("studentEmail").value.trim(),
     modes:{daily:dailyMode,exam:examMode}, targetExamDate:$("targetExamDate").value
   };
@@ -211,7 +216,9 @@ $("logoutBtn").addEventListener("click", () => {
   $("loginName").value = profile?.name || "";
   $("loginClass").value = profile?.studentClass || "";
   $("schoolName").value = profile?.school || "";
-  $("boardName").value = profile?.board || "";
+  $("boardName").value = profile?.board || "CBSE";
+  $("studentState").value = profile?.state || "";
+  $("stateField").hidden = $("boardName").value !== "State Board";
   $("studentPhone").value = profile?.phone || "";
   $("studentEmail").value = profile?.email || "";
   $("dailyMode").checked = profile?.modes?.daily ?? true;
@@ -512,16 +519,17 @@ $("timerPause").addEventListener("click",()=>{clearInterval(timerInterval);timer
 $("timerReset").addEventListener("click",()=>{clearInterval(timerInterval);timerInterval=null;timerRemaining=timerSeconds;paintTimer();$("timerStatus").textContent="Timer reset.";});
 function loadSettings(){
   $("settingsName").value=profile?.name||"";$("settingsClass").value=profile?.studentClass||"10";$("settingsSchool").value=profile?.school||"";
-  $("settingsBoard").value=profile?.board||"";$("settingsStream").value=profile?.stream||"";
+  $("settingsBoard").value=profile?.board||"CBSE";$("settingsState").value=profile?.state||"";$("settingsStateField").hidden=$("settingsBoard").value!=="State Board";$("settingsStream").value=profile?.stream||"";
   $("settingsDaily").checked=profile?.modes?.daily??true;$("settingsExam").checked=profile?.modes?.exam??false;
   $("reminderEnabled").checked=localStorage.getItem("wtReminderEnabled")==="true";$("reminderTime").value=localStorage.getItem("wtReminderTime")||"19:00";
   $("notificationPermission").textContent="Browser permission: "+("Notification" in window?Notification.permission:"not supported in this browser")+". Daily reminders are checked while this app is open.";
 }
+$("settingsBoard").addEventListener("change",()=>{$("settingsStateField").hidden=$("settingsBoard").value!=="State Board";if($("settingsBoard").value!=="State Board")$("settingsState").value="";});
 $("settingsForm").addEventListener("submit",e=>{
   e.preventDefault();const grade=$("settingsClass").value,stream=$("settingsStream").value;
   if(! $("settingsDaily").checked && ! $("settingsExam").checked)return notify("Choose at least one study mode.");
   if(Number(grade)>=11&&!stream)return notify("Choose a stream for Class 11–12.");
-  profile={...profile,name:$("settingsName").value.trim(),studentClass:grade,school:$("settingsSchool").value.trim(),board:$("settingsBoard").value.trim(),stream,modes:{daily:$("settingsDaily").checked,exam:$("settingsExam").checked}};
+  profile={...profile,name:$("settingsName").value.trim(),studentClass:grade,school:$("settingsSchool").value.trim(),board:$("settingsBoard").value,state:$("settingsState").value,stream,modes:{daily:$("settingsDaily").checked,exam:$("settingsExam").checked}};
   localStorage.setItem("wtProfile",JSON.stringify(profile));$("welcomeTitle").textContent="Welcome back, "+profile.name+".";$("avatarInitial").textContent=profile.name.charAt(0).toUpperCase();updateModeVisibility();notify("Profile updated.");
 });
 $("reminderEnabled").addEventListener("change",()=>localStorage.setItem("wtReminderEnabled",String($("reminderEnabled").checked)));
@@ -559,7 +567,7 @@ if(localStorage.getItem("wtLight")==="true") document.body.classList.add("light-
 $("loginName").value = profile?.name || "";
 $("loginClass").value = profile?.studentClass || "";
 $("schoolName").value = profile?.school || "";
-$("boardName").value = profile?.board || "";
+$("boardName").value = profile?.board || "CBSE";
 $("studentPhone").value = profile?.phone || "";
 $("studentEmail").value = profile?.email || "";
 $("dailyMode").checked = profile?.modes?.daily ?? true;
