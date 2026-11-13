@@ -132,3 +132,26 @@ body{background-image:radial-gradient(circle at 12% 18%,#d7b66d0b 0 1px,transpar
 .mode-choices input{accent-color:#d7b66d}
 body.light-mode .setup-field input,body.light-mode .setup-field select,body.light-mode .mode-choices label{background:#fff;color:#202a36}
 @media(max-width:520px){.setup-card{padding:28px 20px}.setup-grid{grid-template-columns:1fr}.mode-choices{display:grid;grid-template-columns:1fr 1fr}}
+
+
+/* Real-world gothic library atmosphere: photography first, effects kept subtle */
+:root{--parchment:#d9c79f;--ink:#101722}
+body{background-color:#0c1119;background-image:linear-gradient(115deg,rgba(7,12,20,.97),rgba(11,19,29,.89) 52%,rgba(8,13,20,.96)),url("https://images.unsplash.com/photo-1727409163282-1a056246df1e?auto=format&fit=crop&w=2200&q=85");background-size:cover;background-position:center;background-attachment:fixed}
+.sidebar{background:linear-gradient(180deg,rgba(7,12,19,.96),rgba(9,15,23,.98)),url("https://images.unsplash.com/photo-1727409163282-1a056246df1e?auto=format&fit=crop&w=900&q=75");background-size:cover;background-position:center;border-right-color:#6b5735}
+.welcome-banner{background:linear-gradient(90deg,rgba(10,17,27,.94),rgba(13,22,32,.78) 62%,rgba(12,18,27,.45)),url("https://images.unsplash.com/photo-1727409163282-1a056246df1e?auto=format&fit=crop&w=1800&q=85");background-size:cover;background-position:center 48%;border-color:#806a45;min-height:190px}
+.welcome-banner:after{border-color:#d7b66d20;box-shadow:0 0 0 25px #d7b66d08,0 0 0 50px #d7b66d05}
+.welcome-banner:before{content:none}
+.banner-seal{font-size:54px;text-shadow:0 2px 16px #000}
+.thought-card{display:flex;align-items:center;gap:16px;margin:0 0 20px;padding:15px 20px;border:1px solid #796443;border-left:3px solid #c5a66a;border-radius:10px;background:linear-gradient(100deg,rgba(26,33,40,.97),rgba(29,35,39,.91)),url("https://images.unsplash.com/photo-1727409163282-1a056246df1e?auto=format&fit=crop&w=1200&q=70");background-size:cover;background-position:center;box-shadow:0 8px 24px #0003}
+.thought-emblem{font-family:Georgia,serif;font-size:30px;color:#d6b879;flex:none}
+.thought-card .eyebrow{margin:0 0 5px;font-size:9px}
+.thought-text{margin:0;color:#f0e6d1;font-family:Georgia,serif;font-size:15px;line-height:1.55}
+.section-intro{padding:22px 24px;border:1px solid #65563e;border-radius:11px;background:linear-gradient(90deg,rgba(12,18,27,.94),rgba(14,22,31,.83)),url("https://images.unsplash.com/photo-1727409163282-1a056246df1e?auto=format&fit=crop&w=1500&q=75");background-size:cover;background-position:center;margin:8px 0 22px}
+.section-intro h1{color:#f1e6cf}
+.login-screen{background:linear-gradient(115deg,rgba(6,11,18,.86),rgba(8,14,22,.72)),url("https://images.unsplash.com/photo-1727409163282-1a056246df1e?auto=format&fit=crop&w=2000&q=85");background-size:cover;background-position:center}
+.login-card{background:rgba(15,23,32,.94);backdrop-filter:blur(7px);border-color:#8a7048}
+.login-card:before,.login-card:after{content:none}
+.guild-card{box-shadow:inset 0 0 25px #0003}
+.guild-symbol{font-size:25px;text-shadow:0 2px 8px #0008}
+.stat-card,.panel,.subject-card{background:rgba(19,29,42,.96);backdrop-filter:blur(5px)}
+@media(max-width:760px){body{background-attachment:scroll}.thought-card{padding:13px 14px;margin-bottom:15px}.thought-text{font-size:13px}.welcome-banner{min-height:155px;background-position:58% center}.section-intro{padding:18px}}
