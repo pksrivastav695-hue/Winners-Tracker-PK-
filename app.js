@@ -190,6 +190,8 @@ $("loginForm").addEventListener("submit", event => {
   const dailyMode = $("dailyMode").checked;
   const examMode = $("examMode").checked;
   if (!name || !studentClass) return notify("Enter your name and class.");
+  if (!$("boardName").value) return notify("Choose your education board.");
+  if ($("boardName").value === "State Board" && !$("studentState").value) return notify("Choose your state.");
   if (!dailyMode && !examMode) return notify("Choose at least one study mode.");
   if (Number(studentClass) >= 11 && !stream) return notify("Choose your stream first.");
   profile = {
@@ -528,6 +530,7 @@ $("settingsBoard").addEventListener("change",()=>{$("settingsStateField").hidden
 $("settingsForm").addEventListener("submit",e=>{
   e.preventDefault();const grade=$("settingsClass").value,stream=$("settingsStream").value;
   if(! $("settingsDaily").checked && ! $("settingsExam").checked)return notify("Choose at least one study mode.");
+  if($("settingsBoard").value==="State Board"&&!$("settingsState").value)return notify("Choose your state.");
   if(Number(grade)>=11&&!stream)return notify("Choose a stream for Class 11–12.");
   profile={...profile,name:$("settingsName").value.trim(),studentClass:grade,school:$("settingsSchool").value.trim(),board:$("settingsBoard").value,state:$("settingsState").value,stream,modes:{daily:$("settingsDaily").checked,exam:$("settingsExam").checked}};
   localStorage.setItem("wtProfile",JSON.stringify(profile));$("welcomeTitle").textContent="Welcome back, "+profile.name+".";$("avatarInitial").textContent=profile.name.charAt(0).toUpperCase();updateModeVisibility();notify("Profile updated.");
