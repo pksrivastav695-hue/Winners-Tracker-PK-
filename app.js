@@ -299,6 +299,7 @@ $("examForm").addEventListener("submit", event => {
   $("examForm").reset();
   renderExams(); updateDashboard(); addNotice("Exam added",subject+" was added to your datesheet."); notify("Exam added to your datesheet.");
 });
+function localDateKey(date=new Date()) { return [date.getFullYear(),String(date.getMonth()+1).padStart(2,"0"),String(date.getDate()).padStart(2,"0")].join("-"); }
 function formatDate(date) {
   return new Intl.DateTimeFormat("en-IN",{day:"numeric",month:"short",year:"numeric"}).format(new Date(date+"T00:00:00"));
 }
@@ -306,7 +307,7 @@ function renderExams() {
   const list = $("examList");
   list.innerHTML = "";
   $("examCount").textContent = exams.length + (exams.length === 1 ? " exam" : " exams");
-  const today = new Date().toISOString().slice(0,10);
+  const today = localDateKey();
   const upcoming = exams.filter(e => e.date >= today).sort((a,b)=>a.date.localeCompare(b.date));
   if (!exams.length) {
     list.innerHTML = '<p class="empty-state">Your datesheet is empty. Add your first exam above.</p>';
@@ -355,7 +356,7 @@ function updateExamPrep() {
   }
 }
 let dailyTasks = read("wtDailyTasks", {});
-function todayKey(){ return new Date().toISOString().slice(0,10); }
+function todayKey(){ return localDateKey(); }
 function renderDailyTasks() {
   const key=todayKey(), tasks=dailyTasks[key] || [];
   const list=$("dailyTasks"); if(!list) return;
@@ -384,7 +385,7 @@ function updateDashboard() {
   const total = subjects.reduce((sum,s)=>sum+s.chapters.length,0);
   const done = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.done).length,0);
   const percent = total ? Math.round(done/total*100) : 0;
-  const today = new Date().toISOString().slice(0,10);
+  const today = localDateKey();
   const upcoming = exams.filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
   $("completedStat").textContent = done;
   $("chapterTotal").textContent = "of " + total + " chapters";
