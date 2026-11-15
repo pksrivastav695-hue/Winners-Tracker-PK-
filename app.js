@@ -115,6 +115,7 @@ function showApp() {
   updateModeVisibility();
   updateDashboard();
   renderDailyTasks();
+  if (!(dailyTasks[todayKey()]||[]).some(task=>task.autoPlan)) generateDailyTargets(false);
   updateExamPrep();
 }
 
@@ -555,7 +556,7 @@ function syncDailyTasksFromChapters(){
     if (!task.chapterKey) return;
     const parts = task.chapterKey.split("::"), subjectName = parts.shift(), chapterName = parts.join("::");
     const chapter = subjects.find(s=>s.name===subjectName)?.chapters.find(ch=>ch.name===chapterName);
-    if (chapter?.done) task.done = true;
+    task.done = !!chapter?.done;
   }));
   localStorage.setItem("wtDailyTasks", JSON.stringify(dailyTasks));
   renderDailyTasks();
