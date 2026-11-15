@@ -26,6 +26,11 @@ function saveSubjects() {
   renderSubjectOverview();
   populateRevisionSubjects();
   updateDashboard();
+  if (typeof dailyTasks !== "undefined" && typeof pendingSelectedChapters === "function") {
+    const todayAuto = (dailyTasks[todayKey()] || []).filter(task => task.autoPlan).length;
+    const limit = Number(localStorage.getItem("wtDailyChapterLimit") || 2);
+    if (todayAuto < limit && pendingSelectedChapters().length) generateDailyTargets(false);
+  }
 }
 function saveExams() {
   localStorage.setItem("wtExams", JSON.stringify(exams));
@@ -567,7 +572,9 @@ function generateDailyTargets(force=false){
   localStorage.setItem("wtDailyChapterLimit",String(limit));
   const used=new Set(tasks.filter(t=>t.chapterKey).map(t=>t.chapterKey));
   const candidates=pendingSelectedChapters().filter(item=>!used.has(item.key));
-  const chosen=candidates.slice(0,limit);
+  const currentAutoCount=tasks.filter(t=>t.autoPlan).length;
+  const slots=force ? limit : Math.max(0,limit-currentAutoCount);
+  const chosen=candidates.slice(0,slots);
   chosen.forEach(item=>tasks.push({
     id:"auto-"+Date.now()+"-"+Math.random().toString(36).slice(2),
     name:"Study: "+item.chapter.name, subject:item.subject.name, done:false,
