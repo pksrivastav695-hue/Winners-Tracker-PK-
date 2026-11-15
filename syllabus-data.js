@@ -10,7 +10,7 @@ window.WT_SYLLABUS = {
     UPMSP: { label: "UPMSP official syllabus portal", url: "https://upmsp.edu.in/Board_Syllabus.aspx" }
   },
   data: {
-    "CBSE": {
+    "State Board": {\n      "Uttar Pradesh": {\n        "10": { session:"2026-27", level:"partial", source:"UPMSP", subjects:[\n          { id:"upmsp10-maths", name:"Mathematics", chapters:["Real Numbers","Polynomials","Pair of Linear Equations in Two Variables","Quadratic Equations","Arithmetic Progressions","Coordinate Geometry","Triangles","Circles","Introduction to Trigonometry","Trigonometric Identities","Heights and Distances","Areas Related to Circles","Surface Areas and Volumes","Statistics","Probability"] }\n        ], note:"Official UPMSP Class 10 Mathematics syllabus for academic session 2026-27. Other subjects are not yet included in this verified starter set." }\n      }\n    },\n    "CBSE": {
       "10": {
         session: "2026-27",
         level: "partial",
