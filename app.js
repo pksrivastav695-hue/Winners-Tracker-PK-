@@ -25,6 +25,61 @@ function saveExams() {
   renderExams();
   updateDashboard();
 }
+function syllabusSource(profileData) {
+  if (profileData?.board === "CBSE") return window.WT_SYLLABUS?.sources?.CBSE;
+  if (profileData?.board === "CISCE") return Number(profileData.studentClass) === 12 ? window.WT_SYLLABUS?.sources?.CISCE_ISC : window.WT_SYLLABUS?.sources?.CISCE_ICSE;
+  if (profileData?.board === "State Board" && profileData?.state === "Uttar Pradesh") return window.WT_SYLLABUS?.sources?.UPMSP;
+  return null;
+}
+function mergeOfficialSyllabus(data) {
+  let addedSubjects = 0, addedChapters = 0;
+  (data.subjects || []).forEach(sourceSubject => {
+    let current = subjects.find(s => s.name.toLowerCase() === sourceSubject.name.toLowerCase());
+    if (!current) {
+      current = { name: sourceSubject.name, chapters: [], syllabusId: sourceSubject.id, syllabusSession: data.session, syllabusSource: data.source };
+      subjects.push(current); addedSubjects++;
+    }
+    current.syllabusId = sourceSubject.id;
+    current.syllabusSession = data.session;
+    current.syllabusSource = data.source;
+    const existing = new Map((current.chapters || []).map(ch => [ch.name.trim().toLowerCase(), ch]));
+    (sourceSubject.chapters || []).forEach(chapterName => {
+      const key = chapterName.trim().toLowerCase();
+      if (!existing.has(key)) { current.chapters.push({ name: chapterName, done: false, official: true }); addedChapters++; }
+      else existing.get(key).official = true;
+    });
+  });
+  localStorage.setItem("subjects", JSON.stringify(subjects));
+  return { addedSubjects, addedChapters };
+}
+function updateSyllabusStatus(messageOverride) {
+  const title = $("syllabusStatusTitle"), text = $("syllabusStatusText"), link = $("syllabusSourceLink"), note = $("syllabusDataNote");
+  if (!title || !profile) return;
+  const boardKey = profile.board === "State Board" ? (profile.state === "Uttar Pradesh" ? "UPMSP" : "") : profile.board;
+  const classData = window.WT_SYLLABUS?.data?.[profile.board]?.[String(profile.studentClass)];
+  const source = syllabusSource(profile);
+  link.hidden = !source;
+  if (source) { link.href = source.url; link.textContent = source.label + " ↗"; }
+  if (classData) {
+    title.textContent = "Official syllabus catalogue available · " + classData.session;
+    text.textContent = messageOverride || classData.note || "Verified subject and chapter data is ready for this class.";
+    note.textContent = "Refreshing adds new official chapters without deleting completed or custom chapters. Current catalogue coverage: " + (classData.level === "partial" ? "partial" : "complete") + ".";
+  } else {
+    title.textContent = "Syllabus catalogue is being expanded";
+    text.textContent = messageOverride || "We do not yet have a verified chapter list for " + (profile.board === "State Board" ? profile.state + " State Board" : profile.board) + ", Class " + profile.studentClass + ". We will not fill this with another board's chapters.";
+    note.textContent = "Your existing subjects and progress are safe. Use the official source link to verify your school's current subject combination; custom subjects and chapters remain available.";
+  }
+}
+function syncOfficialSyllabus(silent=false) {
+  const data = window.WT_SYLLABUS?.data?.[profile?.board]?.[String(profile?.studentClass)];
+  if (!data) { updateSyllabusStatus(); if (!silent) notify("Verified syllabus data for this board and class is not in the catalogue yet."); return false; }
+  const result = mergeOfficialSyllabus(data);
+  renderSubjects(); renderSubjectOverview(); populateRevisionSubjects(); updateDashboard();
+  updateSyllabusStatus(result.addedSubjects || result.addedChapters ? "Added " + result.addedSubjects + " subjects and " + result.addedChapters + " chapters. Existing progress was preserved." : "Your official syllabus is already up to date. Existing progress was preserved.");
+  if (!silent) notify(result.addedSubjects || result.addedChapters ? "Syllabus loaded. Your progress is safe." : "Syllabus is already up to date.");
+  return true;
+}
+
 function showApp() {
   $("loginScreen").classList.add("hidden");
   $("appShell").classList.remove("hidden");
@@ -33,6 +88,8 @@ function showApp() {
   $("todayLabel").textContent = new Intl.DateTimeFormat("en-IN", {day:"numeric", month:"short", year:"numeric"}).format(new Date());
   showPage("overview");
   renderGuild();
+  syncOfficialSyllabus(true);
+  updateSyllabusStatus();
   renderSubjects();
   renderSubjectOverview();
   populateRevisionSubjects();
@@ -153,7 +210,7 @@ function renderGuild() {
   $("guildSelected").textContent = selectedGuild ? "✦ Your guild: " + selectedGuild : "Choose a guild to personalise your study hall.";
 }
 
-function subjectsForSetup(studentClass, stream) {
+function legacySubjectsForSetup(studentClass, stream) {
   const grade = Number(studentClass);
   if (grade >= 11) {
     const choices = {
@@ -201,10 +258,8 @@ $("loginForm").addEventListener("submit", event => {
     modes:{daily:dailyMode,exam:examMode}, targetExamDate:$("targetExamDate").value
   };
   localStorage.setItem("wtProfile", JSON.stringify(profile));
-  if (!subjects.length) {
-    subjects = subjectsForSetup(studentClass,stream).map(name => ({name,chapters:[]}));
-    localStorage.setItem("subjects",JSON.stringify(subjects));
-  }
+  if (!subjects.length) localStorage.setItem("subjects", "[]");
+  syncOfficialSyllabus(true);
   if (examMode && profile.targetExamDate && !exams.some(e=>e.name==="Target Exam")) {
     exams.push({id:Date.now(),name:"Target Exam",subject:"All subjects",date:profile.targetExamDate,time:""});
     localStorage.setItem("wtExams",JSON.stringify(exams));
@@ -219,6 +274,7 @@ $("logoutBtn").addEventListener("click", () => {
   $("loginClass").value = profile?.studentClass || "";
   $("schoolName").value = profile?.school || "";
   $("boardName").value = profile?.board || "CBSE";
+  $("studentState").value = profile?.state || ""; $("stateField").hidden = $("boardName").value !== "State Board";
   $("studentState").value = profile?.state || "";
   $("stateField").hidden = $("boardName").value !== "State Board";
   $("studentPhone").value = profile?.phone || "";
@@ -241,6 +297,7 @@ $("addSubject").addEventListener("click", () => {
   notify("Subject added.");
 });
 $("subjectName").addEventListener("keydown", e => { if(e.key === "Enter") $("addSubject").click(); });
+$("syncSyllabusBtn").addEventListener("click", () => syncOfficialSyllabus(false));
 
 function renderSubjects() {
   const container = $("subjects");
@@ -507,18 +564,21 @@ function renderRevisions() {
     row.append(check,info,del);list.append(row);
   });
 }
-let timerSeconds=25*60,timerRemaining=timerSeconds,timerInterval=null;
-function paintTimer(){const m=String(Math.floor(timerRemaining/60)).padStart(2,"0"),sec=String(timerRemaining%60).padStart(2,"0");$("timerDisplay").textContent=m+":"+sec;}
+let timerSeconds=Number(localStorage.getItem("wtTimerPreset")||25)*60,timerRemaining=Number(localStorage.getItem("wtTimerRemaining")||timerSeconds),timerInterval=null,timerEndAt=Number(localStorage.getItem("wtTimerEndAt")||0);
+if(timerEndAt){timerRemaining=Math.max(0,Math.ceil((timerEndAt-Date.now())/1000));if(timerRemaining===0){timerEndAt=0;localStorage.removeItem("wtTimerEndAt");}}
+
+function paintTimer(){const m=String(Math.floor(timerRemaining/60)).padStart(2,"0"),sec=String(timerRemaining%60).padStart(2,"0");$("timerDisplay").textContent=m+":"+sec;localStorage.setItem("wtTimerRemaining",String(timerRemaining));}
+function tickTimer(){timerRemaining=Math.max(0,Math.ceil((timerEndAt-Date.now())/1000));paintTimer();if(timerRemaining<=0){clearInterval(timerInterval);timerInterval=null;timerEndAt=0;localStorage.removeItem("wtTimerEndAt");$("timerStatus").textContent="Session complete. Take a short break.";addNotice("Focus session complete","You completed a study timer session.");notify("Focus session complete.");}}
+
 document.querySelectorAll("[data-minutes]").forEach(btn=>btn.addEventListener("click",()=>{
-  clearInterval(timerInterval);timerInterval=null;timerSeconds=Number(btn.dataset.minutes)*60;timerRemaining=timerSeconds;paintTimer();
+  clearInterval(timerInterval);timerInterval=null;timerEndAt=0;localStorage.removeItem("wtTimerEndAt");timerSeconds=Number(btn.dataset.minutes)*60;timerRemaining=timerSeconds;localStorage.setItem("wtTimerPreset",btn.dataset.minutes);paintTimer();
   document.querySelectorAll(".timer-preset").forEach(b=>b.classList.toggle("active",b===btn));$("timerStatus").textContent="Session ready.";
 }));
 $("timerStart").addEventListener("click",()=>{
-  if(timerInterval)return;$("timerStatus").textContent="Focus session running.";
-  timerInterval=setInterval(()=>{timerRemaining--;paintTimer();if(timerRemaining<=0){clearInterval(timerInterval);timerInterval=null;timerRemaining=0;paintTimer();$("timerStatus").textContent="Session complete. Take a short break.";addNotice("Focus session complete","You completed a study timer session.");notify("Focus session complete.");}},1000);
+  if(timerInterval)return;timerEndAt=Date.now()+timerRemaining*1000;localStorage.setItem("wtTimerEndAt",String(timerEndAt));$("timerStatus").textContent="Focus session running.";timerInterval=setInterval(tickTimer,250);
 });
-$("timerPause").addEventListener("click",()=>{clearInterval(timerInterval);timerInterval=null;$("timerStatus").textContent="Session paused.";});
-$("timerReset").addEventListener("click",()=>{clearInterval(timerInterval);timerInterval=null;timerRemaining=timerSeconds;paintTimer();$("timerStatus").textContent="Timer reset.";});
+$("timerPause").addEventListener("click",()=>{if(timerEndAt)timerRemaining=Math.max(0,Math.ceil((timerEndAt-Date.now())/1000));clearInterval(timerInterval);timerInterval=null;timerEndAt=0;localStorage.removeItem("wtTimerEndAt");paintTimer();$("timerStatus").textContent="Session paused.";});
+$("timerReset").addEventListener("click",()=>{clearInterval(timerInterval);timerInterval=null;timerEndAt=0;localStorage.removeItem("wtTimerEndAt");timerRemaining=timerSeconds;paintTimer();$("timerStatus").textContent="Timer reset.";});
 function loadSettings(){
   $("settingsName").value=profile?.name||"";$("settingsClass").value=profile?.studentClass||"10";$("settingsSchool").value=profile?.school||"";
   $("settingsBoard").value=profile?.board||"CBSE";$("settingsState").value=profile?.state||"";$("settingsStateField").hidden=$("settingsBoard").value!=="State Board";$("settingsStream").value=profile?.stream||"";
@@ -533,7 +593,7 @@ $("settingsForm").addEventListener("submit",e=>{
   if($("settingsBoard").value==="State Board"&&!$("settingsState").value)return notify("Choose your state.");
   if(Number(grade)>=11&&!stream)return notify("Choose a stream for Class 11–12.");
   profile={...profile,name:$("settingsName").value.trim(),studentClass:grade,school:$("settingsSchool").value.trim(),board:$("settingsBoard").value,state:$("settingsState").value,stream,modes:{daily:$("settingsDaily").checked,exam:$("settingsExam").checked}};
-  localStorage.setItem("wtProfile",JSON.stringify(profile));$("welcomeTitle").textContent="Welcome back, "+profile.name+".";$("avatarInitial").textContent=profile.name.charAt(0).toUpperCase();updateModeVisibility();notify("Profile updated.");
+  localStorage.setItem("wtProfile",JSON.stringify(profile)); syncOfficialSyllabus(true); updateSyllabusStatus(); $("welcomeTitle").textContent="Welcome back, "+profile.name+".";$("avatarInitial").textContent=profile.name.charAt(0).toUpperCase();updateModeVisibility();notify("Profile updated. Existing chapter progress was kept.");
 });
 $("reminderEnabled").addEventListener("change",()=>localStorage.setItem("wtReminderEnabled",String($("reminderEnabled").checked)));
 $("reminderTime").addEventListener("change",()=>localStorage.setItem("wtReminderTime",$("reminderTime").value));
@@ -551,9 +611,29 @@ function checkDailyReminder(){
 }
 setInterval(checkDailyReminder,30000);
 $("exportData").addEventListener("click",()=>{
-  const data={profile,subjects,exams,dailyTasks,revisions,notices,guild:selectedGuild};
+  const data={backupVersion:2,exportedAt:new Date().toISOString(),profile,subjects,exams,dailyTasks,revisions,notices,guild:selectedGuild};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob);
   const a=document.createElement("a");a.href=url;a.download="winners-tracker-backup.json";a.click();URL.revokeObjectURL(url);notify("Backup exported.");
+});
+
+$("importDataBtn").addEventListener("click", () => $("importDataFile").click());
+$("importDataFile").addEventListener("change", async () => {
+  const file = $("importDataFile").files?.[0]; if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!data || typeof data !== "object" || !Array.isArray(data.subjects) || !Array.isArray(data.exams) || !data.profile || typeof data.profile !== "object") throw new Error("This file does not look like a Winners Tracker backup.");
+    if (!confirm("Import this backup and replace the current profile, syllabus progress and plans on this device? Export your current data first if you need it.")) return;
+    profile = data.profile; subjects = data.subjects; exams = data.exams;
+    dailyTasks = data.dailyTasks && typeof data.dailyTasks === "object" ? data.dailyTasks : {};
+    revisions = Array.isArray(data.revisions) ? data.revisions : [];
+    notices = Array.isArray(data.notices) ? data.notices : [];
+    selectedGuild = typeof data.guild === "string" ? data.guild : "";
+    localStorage.setItem("wtProfile", JSON.stringify(profile)); localStorage.setItem("subjects", JSON.stringify(subjects));
+    localStorage.setItem("wtExams", JSON.stringify(exams)); localStorage.setItem("wtDailyTasks", JSON.stringify(dailyTasks));
+    localStorage.setItem("wtRevisions", JSON.stringify(revisions)); localStorage.setItem("wtNotifications", JSON.stringify(notices));
+    localStorage.setItem("wtGuild", selectedGuild); location.reload();
+  } catch (error) { notify(error.message || "Could not read that backup."); }
+  finally { $("importDataFile").value = ""; }
 });
 $("resetData").addEventListener("click",()=>{
   if(!confirm("This will permanently clear this browser's Winners Tracker data. Export a backup first if needed. Continue?"))return;
@@ -561,6 +641,7 @@ $("resetData").addEventListener("click",()=>{
   location.reload();
 });
 updateNotificationBadge();
+paintTimer();if(timerEndAt){$("timerStatus").textContent="Focus session running.";timerInterval=setInterval(tickTimer,250);}
 
 $("themeToggle").addEventListener("click",()=>{
   document.body.classList.toggle("light-mode");
