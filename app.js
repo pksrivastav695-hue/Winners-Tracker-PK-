@@ -657,7 +657,9 @@ $("importDataFile").addEventListener("change", async () => {
     localStorage.setItem("wtProfile", JSON.stringify(profile)); localStorage.setItem("subjects", JSON.stringify(subjects));
     localStorage.setItem("wtExams", JSON.stringify(exams)); localStorage.setItem("wtDailyTasks", JSON.stringify(dailyTasks));
     localStorage.setItem("wtRevisions", JSON.stringify(revisions)); localStorage.setItem("wtNotifications", JSON.stringify(notices));
-    localStorage.setItem("wtGuild", selectedGuild);\n    if(data.preferences){localStorage.setItem("wtLight",String(!!data.preferences.lightMode));localStorage.setItem("wtReminderEnabled",String(!!data.preferences.reminderEnabled));if(data.preferences.reminderTime)localStorage.setItem("wtReminderTime",data.preferences.reminderTime);}\n    location.reload();
+    localStorage.setItem("wtGuild", selectedGuild);
+    if(data.preferences){localStorage.setItem("wtLight",String(!!data.preferences.lightMode));localStorage.setItem("wtReminderEnabled",String(!!data.preferences.reminderEnabled));if(data.preferences.reminderTime)localStorage.setItem("wtReminderTime",data.preferences.reminderTime);}
+    location.reload();
   } catch (error) { notify(error.message || "Could not read that backup."); }
   finally { $("importDataFile").value = ""; }
 });
