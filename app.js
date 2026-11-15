@@ -84,7 +84,14 @@ function syncOfficialSyllabus(silent=false) {
   return true;
 }
 
-function showSetupStep(step) {\n  const first = step === 1;\n  $("setupStep1").hidden = !first; $("setupStep2").hidden = first;\n  $("setupBack").hidden = first; $("setupNext").hidden = !first; $("setupCreate").hidden = first;\n  $("setupProgressOne").classList.toggle("active", first); $("setupProgressTwo").classList.toggle("active", !first);\n  ["loginName","loginClass","boardName"].forEach(id => { $(id).required = first; });\n}\nfunction showApp() {
+function showSetupStep(step) {
+  const first = step === 1;
+  $("setupStep1").hidden = !first; $("setupStep2").hidden = first;
+  $("setupBack").hidden = first; $("setupNext").hidden = !first; $("setupCreate").hidden = first;
+  $("setupProgressOne").classList.toggle("active", first); $("setupProgressTwo").classList.toggle("active", !first);
+  ["loginName","loginClass","boardName"].forEach(id => { $(id).required = first; });
+}
+function showApp() {
   $("loginScreen").classList.add("hidden");
   $("appShell").classList.remove("hidden");
   $("welcomeTitle").textContent = "Welcome back, " + profile.name + ".";
@@ -286,7 +293,8 @@ $("loginForm").addEventListener("submit", event => {
 $("logoutBtn").addEventListener("click", () => {
   $("loginScreen").classList.remove("hidden");
   $("appShell").classList.add("hidden");
-  showSetupStep(1);\n  $("loginName").value = profile?.name || "";
+  showSetupStep(1);
+  $("loginName").value = profile?.name || "";
   $("loginClass").value = profile?.studentClass || "";
   $("schoolName").value = profile?.school || "";
   $("boardName").value = profile?.board || "CBSE";
