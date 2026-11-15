@@ -264,6 +264,7 @@ $("examMode").addEventListener("change", () => {
 });
 $("loginForm").addEventListener("submit", event => {
   event.preventDefault();
+  if ($("setupStep2").hidden) { $("setupNext").click(); return; }
   const name = $("loginName").value.trim();
   const studentClass = $("loginClass").value;
   const stream = $("studentStream").value;
