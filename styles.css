@@ -30,3 +30,5 @@ body.light-mode{color-scheme:light;--bg:#f2f0e9;--surface:#fff;--surface-2:#f8f5
 
 .nav-backdrop{display:none}
 @media(max-width:760px){.nav-backdrop{position:fixed;inset:0;z-index:25;display:block;border:0;background:#03070dbb;opacity:0;pointer-events:none;transition:opacity .2s}.app-shell.nav-open .nav-backdrop{opacity:1;pointer-events:auto}.menu-toggle{position:fixed;top:18px;left:13px;z-index:40}}
+
+[hidden]{display:none!important}
