@@ -1,10 +1,11 @@
-const CACHE_NAME = "winners-tracker-v10";
+const CACHE_NAME = "winners-tracker-v11";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./syllabus-data.js",
   "./manifest.json",
   "./icon.svg"
 ];
