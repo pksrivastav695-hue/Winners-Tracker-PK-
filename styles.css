@@ -32,3 +32,5 @@ body.light-mode{color-scheme:light;--bg:#f2f0e9;--surface:#fff;--surface-2:#f8f5
 @media(max-width:760px){.nav-backdrop{position:fixed;inset:0;z-index:25;display:block;border:0;background:#03070dbb;opacity:0;pointer-events:none;transition:opacity .2s}.app-shell.nav-open .nav-backdrop{opacity:1;pointer-events:auto}.menu-toggle{position:fixed;top:18px;left:13px;z-index:40}}
 
 [hidden]{display:none!important}
+
+.setup-progress{display:flex;align-items:center;gap:12px;margin:25px 0 18px}.setup-progress>i{height:1px;flex:1;background:var(--line)}.setup-progress-step{display:flex;align-items:center;gap:7px;color:#718095;font-size:10px;font-weight:700;letter-spacing:1px}.setup-progress-step small{font-size:10px;font-weight:500;letter-spacing:0}.setup-progress-step.active{color:var(--gold-bright)}.setup-step{display:grid;gap:15px}.setup-step-heading h2{margin:0 0 5px;font-family:Cinzel,Georgia,serif;font-size:19px}.setup-step-heading p:last-child{margin:0;font-size:11px}.setup-navigation{display:flex;align-items:center;gap:10px;margin-top:5px}.setup-navigation .full-btn{margin-top:0}.setup-navigation #setupCreate{flex:1}
