@@ -5,6 +5,13 @@ let exams = read("wtExams", []);
 let profile = read("wtProfile", null);
 let selectedGuild = localStorage.getItem("wtGuild") || "";
 let toastTimer;
+if (!localStorage.getItem("wtChapterSelectionInitialized")) {
+  subjects.forEach(subject => (subject.chapters || []).forEach(chapter => {
+    if (chapter.official) chapter.included = false;
+  }));
+  localStorage.setItem("subjects", JSON.stringify(subjects));
+  localStorage.setItem("wtChapterSelectionInitialized", "true");
+}
 
 function notify(message) {
   const toast = $("toast");
@@ -49,8 +56,8 @@ function mergeOfficialSyllabus(data) {
     const existing = new Map((current.chapters || []).map(ch => [ch.name.trim().toLowerCase(), ch]));
     (sourceSubject.chapters || []).forEach(chapterName => {
       const key = chapterName.trim().toLowerCase();
-      if (!existing.has(key)) { current.chapters.push({ name: chapterName, done: false, official: true, included: true }); addedChapters++; }
-      else { existing.get(key).official = true; if (existing.get(key).included === undefined) existing.get(key).included = true; }
+      if (!existing.has(key)) { current.chapters.push({ name: chapterName, done: false, official: true, included: false }); addedChapters++; }
+      else { existing.get(key).official = true; if (existing.get(key).included === undefined) existing.get(key).included = false; }
     });
   });
   localStorage.setItem("subjects", JSON.stringify(subjects));
@@ -326,6 +333,7 @@ $("syncSyllabusBtn").addEventListener("click", () => syncOfficialSyllabus(false)
 
 function renderSubjects() {
   const container = $("subjects");
+  const openChoosers = new Set([...container.querySelectorAll(".chapter-chooser[open]")].map(el => el.dataset.subject));
   container.innerHTML = "";
   if (!subjects.length) {
     container.innerHTML = '<div class="empty-card"><span>✧</span><h3>Your study shelf is waiting.</h3><p>Your board and class syllabus will appear here when verified chapter data is available.</p></div>';
@@ -366,6 +374,8 @@ function renderSubjects() {
     if (sourceSubject) {
       const chooser = document.createElement("details");
       chooser.className = "chapter-chooser";
+      chooser.dataset.subject = subject.name;
+      chooser.open = openChoosers.has(subject.name);
       const summary = document.createElement("summary");
       summary.textContent = "Select chapters · " + total + " of " + sourceSubject.chapters.length + " included";
       chooser.append(summary);
@@ -373,6 +383,13 @@ function renderSubjects() {
       hint.className = "chapter-picker-hint";
       hint.textContent = "Tick only the chapters included in your school's syllabus. Unselected chapters stay saved but are excluded from your progress.";
       chooser.append(hint);
+      const bulk = document.createElement("div");
+      bulk.className = "chapter-picker-bulk";
+      const selectAll = document.createElement("button");
+      selectAll.type = "button"; selectAll.className = "text-btn"; selectAll.textContent = "Select all";
+      const clearAll = document.createElement("button");
+      clearAll.type = "button"; clearAll.className = "text-btn"; clearAll.textContent = "Clear all";
+      bulk.append(selectAll, clearAll); chooser.append(bulk);
       const options = document.createElement("div");
       options.className = "chapter-picker-list";
       sourceSubject.chapters.forEach(chapterName => {
@@ -381,7 +398,7 @@ function renderSubjects() {
         row.className = "chapter-picker-row";
         const check = document.createElement("input");
         check.type = "checkbox";
-        check.checked = !!chapter && chapter.included !== false;
+        check.checked = !!chapter && chapter.included === true;
         check.addEventListener("change", () => {
           if (!chapter) {
             chapter = {name:chapterName,done:false,official:true,included:true};
@@ -397,6 +414,16 @@ function renderSubjects() {
         options.append(row);
       });
       chooser.append(options);
+      const setAll = selected => {
+        sourceSubject.chapters.forEach(chapterName => {
+          let chapter = subject.chapters.find(ch => ch.name.trim().toLowerCase() === chapterName.trim().toLowerCase());
+          if (!chapter) { chapter = {name:chapterName,done:false,official:true,included:selected}; subject.chapters.push(chapter); }
+          else chapter.included = selected;
+        });
+        saveSubjects();
+      };
+      selectAll.addEventListener("click", () => setAll(true));
+      clearAll.addEventListener("click", () => setAll(false));
       card.append(chooser);
     }
 
@@ -416,7 +443,7 @@ function renderSubjects() {
       checkbox.type = "checkbox";
       checkbox.checked = !!chapter.done;
       checkbox.addEventListener("change", () => {
-        chapter.done = checkbox.checked; saveSubjects();
+        chapter.done = checkbox.checked; saveSubjects(); syncDailyTasksFromChapters();
       });
       const text = document.createElement("span");
       text.textContent = chapter.name;
@@ -517,6 +544,39 @@ function updateExamPrep() {
 }
 let dailyTasks = read("wtDailyTasks", {});
 function todayKey(){ return localDateKey(); }
+function chapterTaskKey(subject, chapter){ return subject.name + "::" + chapter.name; }
+function pendingSelectedChapters(){
+  return subjects.flatMap(subject => subject.chapters
+    .filter(ch => ch.included === true && !ch.done)
+    .map(ch => ({subject, chapter:ch, key:chapterTaskKey(subject,ch)})));
+}
+function syncDailyTasksFromChapters(){
+  Object.values(dailyTasks).forEach(tasks => (tasks||[]).forEach(task => {
+    if (!task.chapterKey) return;
+    const parts = task.chapterKey.split("::"), subjectName = parts.shift(), chapterName = parts.join("::");
+    const chapter = subjects.find(s=>s.name===subjectName)?.chapters.find(ch=>ch.name===chapterName);
+    if (chapter?.done) task.done = true;
+  }));
+  localStorage.setItem("wtDailyTasks", JSON.stringify(dailyTasks));
+  renderDailyTasks();
+}
+function generateDailyTargets(force=false){
+  const key=todayKey(), tasks=dailyTasks[key] || [];
+  const limit=Math.max(1,Math.min(8,Number($("dailyChapterLimit").value||2)));
+  localStorage.setItem("wtDailyChapterLimit",String(limit));
+  const used=new Set(tasks.filter(t=>t.chapterKey).map(t=>t.chapterKey));
+  const candidates=pendingSelectedChapters().filter(item=>!used.has(item.key));
+  const chosen=candidates.slice(0,limit);
+  chosen.forEach(item=>tasks.push({
+    id:"auto-"+Date.now()+"-"+Math.random().toString(36).slice(2),
+    name:"Study: "+item.chapter.name, subject:item.subject.name, done:false,
+    autoPlan:true, chapterKey:item.key
+  }));
+  dailyTasks[key]=tasks;
+  localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));
+  renderDailyTasks();
+  notify(chosen.length ? chosen.length+" chapter target(s) added." : "No new pending chapters. Select chapters or finish today's plan.");
+}
 function renderDailyTasks() {
   const key=todayKey(), tasks=dailyTasks[key] || [];
   const list=$("dailyTasks"); if(!list) return;
@@ -524,17 +584,31 @@ function renderDailyTasks() {
   $("dailyCount").textContent=tasks.filter(t=>t.done).length+" / "+tasks.length+" done";
   const subjectSelect=$("dailySubject");
   if(subjectSelect){const current=subjectSelect.value;subjectSelect.innerHTML='<option value="">Subject (optional)</option>';subjects.forEach(s=>{const o=document.createElement("option");o.value=s.name;o.textContent=s.name;subjectSelect.append(o);});subjectSelect.value=current;}
-  if(!tasks.length){list.innerHTML='<p class="empty-state">No targets yet. Add the first small task.</p>';return;}
+  if(!tasks.length){list.innerHTML='<p class="empty-state">No targets yet. Generate your chapter plan or add a personal task.</p>';return;}
   tasks.forEach((task,index)=>{
     const row=document.createElement("label");row.className="daily-task"+(task.done?" is-done":"");
     const check=document.createElement("input");check.type="checkbox";check.checked=!!task.done;
-    check.addEventListener("change",()=>{task.done=check.checked;dailyTasks[key]=tasks;localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));renderDailyTasks();});
+    check.addEventListener("change",()=>{
+      task.done=check.checked;
+      if(task.chapterKey){
+        const parts=task.chapterKey.split("::"), subjectName=parts.shift(), chapterName=parts.join("::");
+        const chapter=subjects.find(s=>s.name===subjectName)?.chapters.find(ch=>ch.name===chapterName);
+        if(chapter) chapter.done=check.checked;
+        localStorage.setItem("subjects",JSON.stringify(subjects));
+        renderSubjects();renderSubjectOverview();populateRevisionSubjects();updateDashboard();
+      }
+      dailyTasks[key]=tasks;localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));renderDailyTasks();
+    });
     const name=document.createElement("span");name.textContent=task.name;
-    const subject=document.createElement("small");subject.textContent=task.subject||"Personal target";
-    const del=document.createElement("button");del.type="button";del.className="subtle-btn";del.textContent="×";del.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();tasks.splice(index,1);dailyTasks[key]=tasks;localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));renderDailyTasks();});
+    const subject=document.createElement("small");subject.textContent=(task.subject||"Personal target")+(task.autoPlan?" · syllabus target":"");
+    const del=document.createElement("button");del.type="button";del.className="subtle-btn";del.textContent="×";
+    del.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();tasks.splice(index,1);dailyTasks[key]=tasks;localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));renderDailyTasks();});
     row.append(check,name,subject,del);list.append(row);
   });
 }
+$("dailyChapterLimit").value=localStorage.getItem("wtDailyChapterLimit")||"2";
+$("dailyChapterLimit").addEventListener("change",()=>localStorage.setItem("wtDailyChapterLimit",$("dailyChapterLimit").value));
+$("generateDailyPlan").addEventListener("click",()=>generateDailyTargets(true));
 $("dailyForm").addEventListener("submit",e=>{
   e.preventDefault();const name=$("dailyTask").value.trim();if(!name)return;
   const key=todayKey();dailyTasks[key]=dailyTasks[key]||[];
