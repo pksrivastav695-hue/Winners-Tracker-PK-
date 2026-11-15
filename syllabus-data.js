@@ -15,7 +15,12 @@ window.WT_SYLLABUS = {
         "10": { session:"2026-27", level:"partial", source:"UPMSP", subjects:[
           { id:"upmsp10-maths", name:"Mathematics", chapters:["Real Numbers","Polynomials","Pair of Linear Equations in Two Variables","Quadratic Equations","Arithmetic Progressions","Coordinate Geometry","Triangles","Circles","Introduction to Trigonometry","Trigonometric Identities","Heights and Distances","Areas Related to Circles","Surface Areas and Volumes","Statistics","Probability"] },
           { id:"upmsp10-social-science", name:"Social Science", chapters:["The Rise of Nationalism in Europe","Nationalism in India","The Making of a Global World","The Age of Industrialisation","Print Culture and the Modern World","Resources and Development","Forest and Wildlife Resources","Water Resources","Agriculture","Minerals and Energy Resources","Manufacturing Industries","Lifelines of National Economy","Power Sharing","Federalism","Gender, Religion and Caste","Political Parties","Outcomes of Democracy","Development","Sectors of the Indian Economy","Money and Credit","Globalisation and the Indian Economy","Consumer Rights"] }
-        ], note:"Official UPMSP Class 10 Mathematics syllabus for academic session 2026-27. Other subjects are not yet included in this verified starter set." }
+          { id:"upmsp10-english", name:"English", chapters:[
+            "First Flight: A Letter to God","First Flight: Nelson Mandela - Long Walk to Freedom","First Flight: Two Stories about Flying","First Flight: From the Diary of Anne Frank","First Flight: Glimpses of India","First Flight: Mijbil the Otter","First Flight: Madam Rides the Bus","First Flight: The Sermon at Benares","First Flight: The Proposal",
+            "Poem: Dust of Snow","Poem: Fire and Ice","Poem: A Tiger in the Zoo","Poem: How to Tell Wild Animals","Poem: The Ball Poem","Poem: Amanda!","Poem: The Trees","Poem: Fog","Poem: The Tale of Custard the Dragon","Poem: For Anne Gregory",
+            "Footprints Without Feet: A Triumph of Surgery","Footprints Without Feet: The Thief's Story","Footprints Without Feet: The Midnight Visitor","Footprints Without Feet: A Question of Trust","Footprints Without Feet: Footprints Without Feet","Footprints Without Feet: The Making of a Scientist","Footprints Without Feet: The Necklace","Footprints Without Feet: Bholi","Footprints Without Feet: The Book That Saved the Earth"
+          ]},
+        ], note:"Official UPMSP Class 10 Mathematics and English syllabus for academic session 2026-27. Social Science is also included; other subjects remain to be imported." }
       }
     },
     "CBSE": {
@@ -36,10 +41,19 @@ window.WT_SYLLABUS = {
             "Electricity","Magnetic Effects of Electric Current","Our Environment"
           ]},
           { id:"cbse10-english", name:"English Language and Literature", chapters:[
-            "Reading Comprehension","Writing Skills and Grammar","First Flight - Prose and Poetry","Footprints Without Feet"
+            "First Flight: A Letter to God","First Flight: Nelson Mandela - Long Walk to Freedom","First Flight: Two Stories about Flying","First Flight: From the Diary of Anne Frank","First Flight: Glimpses of India","First Flight: Mijbil the Otter","First Flight: Madam Rides the Bus","First Flight: The Sermon at Benares","First Flight: The Proposal",
+            "Poem: Dust of Snow","Poem: Fire and Ice","Poem: A Tiger in the Zoo","Poem: How to Tell Wild Animals","Poem: The Ball Poem","Poem: Amanda!","Poem: The Trees","Poem: Fog","Poem: The Tale of Custard the Dragon","Poem: For Anne Gregory",
+            "Footprints Without Feet: A Triumph of Surgery","Footprints Without Feet: The Thief's Story","Footprints Without Feet: The Midnight Visitor","Footprints Without Feet: A Question of Trust","Footprints Without Feet: Footprints Without Feet","Footprints Without Feet: The Making of a Scientist","Footprints Without Feet: The Necklace","Footprints Without Feet: Bholi","Footprints Without Feet: The Book That Saved the Earth",
+            "Reading Comprehension","Writing Skills and Grammar"
+          ]},
+          { id:"cbse10-social-science", name:"Social Science", chapters:[
+            "History: The Rise of Nationalism in Europe","History: Nationalism in India","History: The Making of a Global World","History: The Age of Industrialisation (Periodic Assessment)","History: Print Culture and the Modern World",
+            "Geography: Resources and Development","Geography: Forest and Wildlife Resources","Geography: Water Resources","Geography: Agriculture","Geography: Minerals and Energy Resources","Geography: Manufacturing Industries","Geography: Lifelines of National Economy (Map Work)",
+            "Political Science: Power-sharing","Political Science: Federalism","Political Science: Gender, Religion and Caste","Political Science: Political Parties","Political Science: Outcomes of Democracy",
+            "Economics: Development","Economics: Sectors of the Indian Economy","Economics: Money and Credit","Economics: Globalisation and the Indian Economy","Economics: Consumer Rights (Project Work)"
           ]}
         ],
-        note:"Verified from CBSE's 2026-27 Class X curriculum PDFs. This starter set is partial: school language choice, Social Science and optional subjects still need to be matched to the student's exact subject combination."
+        note:"Verified from CBSE's 2026-27 Class X curriculum PDFs. This starter set is partial: choose the correct Hindi course and optional subjects separately; Social Science chapter titles are included with assessment notes."
       }
     }
   }
