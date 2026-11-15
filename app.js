@@ -84,7 +84,7 @@ function syncOfficialSyllabus(silent=false) {
   return true;
 }
 
-function showApp() {
+function showSetupStep(step) {\n  const first = step === 1;\n  $("setupStep1").hidden = !first; $("setupStep2").hidden = first;\n  $("setupBack").hidden = first; $("setupNext").hidden = !first; $("setupCreate").hidden = first;\n  $("setupProgressOne").classList.toggle("active", first); $("setupProgressTwo").classList.toggle("active", !first);\n  ["loginName","loginClass","boardName"].forEach(id => { $(id).required = first; });\n}\nfunction showApp() {
   $("loginScreen").classList.add("hidden");
   $("appShell").classList.remove("hidden");
   $("welcomeTitle").textContent = "Welcome back, " + profile.name + ".";
@@ -242,6 +242,16 @@ $("loginClass").addEventListener("change", () => {
   $("streamField").hidden = !senior;
   if (!senior) $("studentStream").value = "";
 });
+$("setupNext").addEventListener("click", () => {
+  const name=$("loginName").value.trim(), grade=$("loginClass").value, board=$("boardName").value;
+  if(!name)return notify("Enter your name first.");
+  if(!grade)return notify("Select your class.");
+  if(!board)return notify("Select your board.");
+  if(board==="State Board"&&!$("studentState").value)return notify("Select your state.");
+  if(Number(grade)>=11&&!$("studentStream").value)return notify("Choose your stream.");
+  showSetupStep(2);
+});
+$("setupBack").addEventListener("click", () => showSetupStep(1));
 $("examMode").addEventListener("change", () => {
   $("targetExamField").hidden = !$("examMode").checked;
 });
@@ -276,7 +286,7 @@ $("loginForm").addEventListener("submit", event => {
 $("logoutBtn").addEventListener("click", () => {
   $("loginScreen").classList.remove("hidden");
   $("appShell").classList.add("hidden");
-  $("loginName").value = profile?.name || "";
+  showSetupStep(1);\n  $("loginName").value = profile?.name || "";
   $("loginClass").value = profile?.studentClass || "";
   $("schoolName").value = profile?.school || "";
   $("boardName").value = profile?.board || "CBSE";
