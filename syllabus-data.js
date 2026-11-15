@@ -51,9 +51,23 @@ window.WT_SYLLABUS = {
             "Geography: Resources and Development","Geography: Forest and Wildlife Resources","Geography: Water Resources","Geography: Agriculture","Geography: Minerals and Energy Resources","Geography: Manufacturing Industries","Geography: Lifelines of National Economy (Map Work)",
             "Political Science: Power-sharing","Political Science: Federalism","Political Science: Gender, Religion and Caste","Political Science: Political Parties","Political Science: Outcomes of Democracy",
             "Economics: Development","Economics: Sectors of the Indian Economy","Economics: Money and Credit","Economics: Globalisation and the Indian Economy","Economics: Consumer Rights (Project Work)"
+          ]},
+          { id:"cbse10-hindi-b", name:"Hindi Course-B", chapters:[
+            "गद्य: बड़े भाई साहब","गद्य: डायरी का एक पन्ना","गद्य: तताँरा-वामीरो कथा","गद्य: तीसरी कसम के शिल्पकार शैलेन्द्र","गद्य: अब कहाँ दूसरे के दुख से दुखी होने वाले","गद्य: पतझर में टूटी पत्तियाँ","गद्य: कारतूस",
+            "काव्य: साखी","काव्य: पद","काव्य: मनुष्यता","काव्य: पर्वत प्रदेश में पावस","काव्य: तोप","काव्य: कर चले हम फ़िदा","काव्य: आत्मत्राण",
+            "संचयन: हरिहर काका","संचयन: सपनों के-से दिन","संचयन: टोपी शुक्ला",
+            "व्याकरण: पदबंध","व्याकरण: रचना के आधार पर वाक्य रूपांतरण","व्याकरण: समास","व्याकरण: मुहावरे",
+            "लेखन: अनुच्छेद","लेखन: औपचारिक पत्र","लेखन: सूचना","लेखन: विज्ञापन","लेखन: ई-मेल / लघुकथा"
+          ]},
+          { id:"cbse10-it402", name:"Information Technology (402)", chapters:[
+            "Employability Skills: Communication Skills-II","Employability Skills: Self-Management Skills-II","Employability Skills: ICT Skills-II","Employability Skills: Entrepreneurial Skills-II","Employability Skills: Green Skills-II",
+            "Digital Documentation: Introduction to Styles","Digital Documentation: Working with Images","Digital Documentation: Advanced Features of Writer",
+            "Electronic Spreadsheet: Analyse Data Using Scenarios and Goal Seek","Electronic Spreadsheet: Using Macros in Spreadsheet","Electronic Spreadsheet: Linking Spreadsheet Data","Electronic Spreadsheet: Share and Review a Spreadsheet",
+            "Database Management System: Introduction to Database Management System","Database Management System: Creating and Using Tables","Database Management System: Working with Queries","Database Management System: Forms and Reports",
+            "Web Applications and Security: Maintain Healthy, Safe and Secure Working Environment"
           ]}
         ],
-        note:"Verified from CBSE's 2026-27 Class X curriculum PDFs. This starter set is partial: choose the correct Hindi course and optional subjects separately; Social Science chapter titles are included with assessment notes."
+        note:"Verified from CBSE's 2026-27 Class X curriculum PDFs for Mathematics, Science, Social Science, English, Hindi Course-B and Information Technology (402). The catalogue is still partial for language alternatives and other optional subjects."
       }
     }
   }
