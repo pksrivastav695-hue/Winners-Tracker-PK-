@@ -25,7 +25,7 @@ function saveExams() {
   renderExams();
   updateDashboard();
 }
-function syllabusSource(profileData) {
+function getSyllabusData(profileData) {\n  if (profileData?.board === "State Board") return window.WT_SYLLABUS?.data?.["State Board"]?.[profileData.state]?.[String(profileData.studentClass)];\n  return window.WT_SYLLABUS?.data?.[profileData?.board]?.[String(profileData?.studentClass)];\n}\nfunction syllabusSource(profileData) {
   if (profileData?.board === "CBSE") return window.WT_SYLLABUS?.sources?.CBSE;
   if (profileData?.board === "CISCE") return Number(profileData.studentClass) === 12 ? window.WT_SYLLABUS?.sources?.CISCE_ISC : window.WT_SYLLABUS?.sources?.CISCE_ICSE;
   if (profileData?.board === "State Board" && profileData?.state === "Uttar Pradesh") return window.WT_SYLLABUS?.sources?.UPMSP;
@@ -56,7 +56,7 @@ function updateSyllabusStatus(messageOverride) {
   const title = $("syllabusStatusTitle"), text = $("syllabusStatusText"), link = $("syllabusSourceLink"), note = $("syllabusDataNote");
   if (!title || !profile) return;
   const boardKey = profile.board === "State Board" ? (profile.state === "Uttar Pradesh" ? "UPMSP" : "") : profile.board;
-  const classData = window.WT_SYLLABUS?.data?.[profile.board]?.[String(profile.studentClass)];
+  const classData = getSyllabusData(profile);
   const source = syllabusSource(profile);
   link.hidden = !source;
   if (source) { link.href = source.url; link.textContent = source.label + " ↗"; }
@@ -71,7 +71,7 @@ function updateSyllabusStatus(messageOverride) {
   }
 }
 function syncOfficialSyllabus(silent=false) {
-  const data = window.WT_SYLLABUS?.data?.[profile?.board]?.[String(profile?.studentClass)];
+  const data = getSyllabusData(profile);
   if (!data) { updateSyllabusStatus(); if (!silent) notify("Verified syllabus data for this board and class is not in the catalogue yet."); return false; }
   const result = mergeOfficialSyllabus(data);
   renderSubjects(); renderSubjectOverview(); populateRevisionSubjects(); updateDashboard();
@@ -190,14 +190,16 @@ function showPage(page) {
   if (page === "revision") renderRevisions();
   if (page === "notifications") renderNotifications();
   if (page === "settings") loadSettings();
-  $("appShell").classList.remove("nav-open");
-  $("menuToggle").setAttribute("aria-expanded","false");
+  closeNavigation();
 }
 document.querySelectorAll(".nav-link").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.page)));
+function closeNavigation(){ $("appShell").classList.remove("nav-open"); $("menuToggle").setAttribute("aria-expanded","false"); }
 $("menuToggle").addEventListener("click", () => {
   const open = $("appShell").classList.toggle("nav-open");
   $("menuToggle").setAttribute("aria-expanded", String(open));
 });
+$("navBackdrop").addEventListener("click", closeNavigation);
+document.addEventListener("keydown", event => { if(event.key === "Escape") closeNavigation(); });
 document.querySelectorAll("[data-go]").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.go)));
 document.querySelectorAll("[data-guild]").forEach(btn => btn.addEventListener("click", () => {
   selectedGuild = btn.dataset.guild;
@@ -580,13 +582,14 @@ $("timerStart").addEventListener("click",()=>{
 $("timerPause").addEventListener("click",()=>{if(timerEndAt)timerRemaining=Math.max(0,Math.ceil((timerEndAt-Date.now())/1000));clearInterval(timerInterval);timerInterval=null;timerEndAt=0;localStorage.removeItem("wtTimerEndAt");paintTimer();$("timerStatus").textContent="Session paused.";});
 $("timerReset").addEventListener("click",()=>{clearInterval(timerInterval);timerInterval=null;timerEndAt=0;localStorage.removeItem("wtTimerEndAt");timerRemaining=timerSeconds;paintTimer();$("timerStatus").textContent="Timer reset.";});
 function loadSettings(){
-  $("settingsName").value=profile?.name||"";$("settingsClass").value=profile?.studentClass||"10";$("settingsSchool").value=profile?.school||"";
+  $("settingsName").value=profile?.name||"";$("settingsClass").value=profile?.studentClass||"10";$("settingsSchool").value=profile?.school||""; $("settingsStreamField").hidden=Number(profile?.studentClass||10)<11;
   $("settingsBoard").value=profile?.board||"CBSE";$("settingsState").value=profile?.state||"";$("settingsStateField").hidden=$("settingsBoard").value!=="State Board";$("settingsStream").value=profile?.stream||"";
   $("settingsDaily").checked=profile?.modes?.daily??true;$("settingsExam").checked=profile?.modes?.exam??false;
   $("reminderEnabled").checked=localStorage.getItem("wtReminderEnabled")==="true";$("reminderTime").value=localStorage.getItem("wtReminderTime")||"19:00";
   $("notificationPermission").textContent="Browser permission: "+("Notification" in window?Notification.permission:"not supported in this browser")+". Daily reminders are checked while this app is open.";
 }
 $("settingsBoard").addEventListener("change",()=>{$("settingsStateField").hidden=$("settingsBoard").value!=="State Board";if($("settingsBoard").value!=="State Board")$("settingsState").value="";});
+$("settingsClass").addEventListener("change",()=>{$("settingsStreamField").hidden=Number($("settingsClass").value)<11;if($("settingsStreamField").hidden)$("settingsStream").value="";});
 $("settingsForm").addEventListener("submit",e=>{
   e.preventDefault();const grade=$("settingsClass").value,stream=$("settingsStream").value;
   if(! $("settingsDaily").checked && ! $("settingsExam").checked)return notify("Choose at least one study mode.");
