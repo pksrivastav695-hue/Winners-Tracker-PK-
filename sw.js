@@ -1,4 +1,4 @@
-const CACHE_NAME = "winners-tracker-v17";
+const CACHE_NAME = "winners-tracker-v18";
 
 const FILES_TO_CACHE = [
   "./",
