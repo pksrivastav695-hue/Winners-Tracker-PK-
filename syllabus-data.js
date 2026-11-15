@@ -13,7 +13,7 @@ window.WT_SYLLABUS = {
     "State Board": {
       "Uttar Pradesh": {
         "10": { session:"2026-27", level:"partial", source:"UPMSP", subjects:[
-          { id:"upmsp10-maths", name:"Mathematics", chapters:["Real Numbers","Polynomials","Pair of Linear Equations in Two Variables","Quadratic Equations","Arithmetic Progressions","Coordinate Geometry","Triangles","Circles","Introduction to Trigonometry","Trigonometric Identities","Heights and Distances","Areas Related to Circles","Surface Areas and Volumes","Statistics","Probability"] }
+          { id:"upmsp10-maths", name:"Mathematics", chapters:["Real Numbers","Polynomials","Pair of Linear Equations in Two Variables","Quadratic Equations","Arithmetic Progressions","Coordinate Geometry","Triangles","Circles","Introduction to Trigonometry","Trigonometric Identities","Heights and Distances","Areas Related to Circles","Surface Areas and Volumes","Statistics","Probability"] },\n          { id:"upmsp10-social-science", name:"Social Science", chapters:["The Rise of Nationalism in Europe","Nationalism in India","The Making of a Global World","The Age of Industrialisation","Print Culture and the Modern World","Resources and Development","Forest and Wildlife Resources","Water Resources","Agriculture","Minerals and Energy Resources","Manufacturing Industries","Lifelines of National Economy","Power Sharing","Federalism","Gender, Religion and Caste","Political Parties","Outcomes of Democracy","Development","Sectors of the Indian Economy","Money and Credit","Globalisation and the Indian Economy","Consumer Rights"] }
         ], note:"Official UPMSP Class 10 Mathematics syllabus for academic session 2026-27. Other subjects are not yet included in this verified starter set." }
       }
     },
