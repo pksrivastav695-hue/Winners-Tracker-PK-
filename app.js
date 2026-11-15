@@ -31,7 +31,7 @@ function getSyllabusData(profileData) {
 }
 function syllabusSource(profileData) {
   if (profileData?.board === "CBSE") return window.WT_SYLLABUS?.sources?.CBSE;
-  if (profileData?.board === "CISCE") return Number(profileData.studentClass) === 12 ? window.WT_SYLLABUS?.sources?.CISCE_ISC : window.WT_SYLLABUS?.sources?.CISCE_ICSE;
+  if (profileData?.board === "CISCE") return Number(profileData.studentClass) >= 11 ? window.WT_SYLLABUS?.sources?.CISCE_ISC : window.WT_SYLLABUS?.sources?.CISCE_ICSE;
   if (profileData?.board === "State Board" && profileData?.state === "Uttar Pradesh") return window.WT_SYLLABUS?.sources?.UPMSP;
   return null;
 }
