@@ -49,8 +49,8 @@ function mergeOfficialSyllabus(data) {
     const existing = new Map((current.chapters || []).map(ch => [ch.name.trim().toLowerCase(), ch]));
     (sourceSubject.chapters || []).forEach(chapterName => {
       const key = chapterName.trim().toLowerCase();
-      if (!existing.has(key)) { current.chapters.push({ name: chapterName, done: false, official: true }); addedChapters++; }
-      else existing.get(key).official = true;
+      if (!existing.has(key)) { current.chapters.push({ name: chapterName, done: false, official: true, included: true }); addedChapters++; }
+      else { existing.get(key).official = true; if (existing.get(key).included === undefined) existing.get(key).included = true; }
     });
   });
   localStorage.setItem("subjects", JSON.stringify(subjects));
@@ -328,12 +328,14 @@ function renderSubjects() {
   const container = $("subjects");
   container.innerHTML = "";
   if (!subjects.length) {
-    container.innerHTML = '<div class="empty-card"><span>✧</span><h3>Your study shelf is waiting.</h3><p>Add your first subject to start tracking chapters.</p></div>';
+    container.innerHTML = '<div class="empty-card"><span>✧</span><h3>Your study shelf is waiting.</h3><p>Your board and class syllabus will appear here when verified chapter data is available.</p></div>';
     return;
   }
+  const catalogue = getSyllabusData(profile);
   subjects.forEach((subject, index) => {
-    const total = subject.chapters.length;
-    const done = subject.chapters.filter(c => c.done).length;
+    const visibleChapters = subject.chapters.filter(ch => ch.included !== false);
+    const total = visibleChapters.length;
+    const done = visibleChapters.filter(ch => ch.done).length;
     const card = document.createElement("article");
     card.className = "subject-card";
     const head = document.createElement("div");
@@ -342,7 +344,7 @@ function renderSubjects() {
     const h3 = document.createElement("h3");
     h3.textContent = subject.name;
     const meta = document.createElement("p");
-    meta.textContent = done + " of " + total + " chapters complete";
+    meta.textContent = done + " of " + total + " selected chapters complete";
     title.append(h3, meta);
     const del = document.createElement("button");
     del.className = "subtle-btn";
@@ -359,9 +361,55 @@ function renderSubjects() {
     fill.style.width = (total ? done/total*100 : 0) + "%";
     track.append(fill);
     card.append(head,track);
+
+    const sourceSubject = catalogue?.subjects?.find(s => s.name.toLowerCase() === subject.name.toLowerCase() || s.id === subject.syllabusId);
+    if (sourceSubject) {
+      const chooser = document.createElement("details");
+      chooser.className = "chapter-chooser";
+      const summary = document.createElement("summary");
+      summary.textContent = "Select chapters · " + total + " of " + sourceSubject.chapters.length + " included";
+      chooser.append(summary);
+      const hint = document.createElement("p");
+      hint.className = "chapter-picker-hint";
+      hint.textContent = "Tick only the chapters included in your school's syllabus. Unselected chapters stay saved but are excluded from your progress.";
+      chooser.append(hint);
+      const options = document.createElement("div");
+      options.className = "chapter-picker-list";
+      sourceSubject.chapters.forEach(chapterName => {
+        let chapter = subject.chapters.find(ch => ch.name.trim().toLowerCase() === chapterName.trim().toLowerCase());
+        const row = document.createElement("label");
+        row.className = "chapter-picker-row";
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = !!chapter && chapter.included !== false;
+        check.addEventListener("change", () => {
+          if (!chapter) {
+            chapter = {name:chapterName,done:false,official:true,included:true};
+            subject.chapters.push(chapter);
+          } else {
+            chapter.included = check.checked;
+          }
+          saveSubjects();
+        });
+        const name = document.createElement("span");
+        name.textContent = chapterName;
+        row.append(check,name);
+        options.append(row);
+      });
+      chooser.append(options);
+      card.append(chooser);
+    }
+
     const chapterList = document.createElement("div");
     chapterList.className = "chapter-list";
-    subject.chapters.forEach((chapter, chapterIndex) => {
+    if (!visibleChapters.length) {
+      const empty = document.createElement("p");
+      empty.className = "empty-state";
+      empty.textContent = "No chapters selected. Open “Select chapters” above.";
+      chapterList.append(empty);
+    }
+    visibleChapters.forEach(chapter => {
+      const chapterIndex = subject.chapters.indexOf(chapter);
       const label = document.createElement("label");
       label.className = "chapter-row" + (chapter.done ? " is-done" : "");
       const checkbox = document.createElement("input");
@@ -383,7 +431,7 @@ function renderSubjects() {
     const addWrap = document.createElement("form");
     addWrap.className = "chapter-add";
     const input = document.createElement("input");
-    input.placeholder = "Add a chapter or topic...";
+    input.placeholder = "Add a custom chapter or topic...";
     const add = document.createElement("button");
     add.type = "submit"; add.textContent = "+";
     addWrap.append(input,add);
@@ -391,7 +439,8 @@ function renderSubjects() {
       e.preventDefault();
       const name = input.value.trim();
       if (!name) return;
-      subject.chapters.push({name,done:false}); saveSubjects();
+      if (subject.chapters.some(ch => ch.name.toLowerCase() === name.toLowerCase())) return notify("This chapter is already listed.");
+      subject.chapters.push({name,done:false,included:true,official:false}); saveSubjects();
     });
     card.append(chapterList,addWrap);
     container.append(card);
@@ -448,8 +497,8 @@ function renderExams() {
   });
 }
 function updateExamPrep() {
-  const total = subjects.reduce((sum,s)=>sum+s.chapters.length,0);
-  const done = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.done).length,0);
+  const total = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.included!==false).length,0);
+  const done = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.included!==false && c.done).length,0);
   const pct = total ? Math.round(done/total*100) : 0;
   const today = new Date(); today.setHours(0,0,0,0);
   const upcoming = exams.filter(e=>new Date(e.date+"T00:00:00")>=today).sort((a,b)=>a.date.localeCompare(b.date));
@@ -493,8 +542,8 @@ $("dailyForm").addEventListener("submit",e=>{
   localStorage.setItem("wtDailyTasks",JSON.stringify(dailyTasks));$("dailyForm").reset();renderDailyTasks();notify("Daily target added.");
 });
 function updateDashboard() {
-  const total = subjects.reduce((sum,s)=>sum+s.chapters.length,0);
-  const done = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.done).length,0);
+  const total = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.included!==false).length,0);
+  const done = subjects.reduce((sum,s)=>sum+s.chapters.filter(c=>c.included!==false && c.done).length,0);
   const percent = total ? Math.round(done/total*100) : 0;
   const today = localDateKey();
   const upcoming = exams.filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date));
@@ -550,7 +599,7 @@ function renderSubjectOverview() {
   const wrap=$("subjectOverview");if(!wrap)return;wrap.innerHTML="";
   if(!subjects.length){wrap.innerHTML='<div class="empty-card"><h3>No subjects yet</h3><p>Add subjects in the Syllabus Tracker.</p></div>';return;}
   subjects.forEach(sub=>{
-    const total=sub.chapters.length,done=sub.chapters.filter(c=>c.done).length;
+    const total=sub.chapters.filter(c=>c.included!==false).length,done=sub.chapters.filter(c=>c.included!==false && c.done).length;
     const card=document.createElement("article");card.className="subject-card";
     const title=document.createElement("h3");title.textContent=sub.name;
     const meta=document.createElement("p");meta.className="muted";meta.textContent=done+" / "+total+" chapters completed";
@@ -567,7 +616,7 @@ function populateRevisionSubjects() {
 function populateRevisionChapters() {
   const subject=$("revisionSubject")?.value,sel=$("revisionChapter");if(!sel)return;sel.innerHTML='<option value="">Choose chapter</option>';
   const found=subjects.find(s=>s.name===subject);
-  (found?.chapters||[]).forEach(ch=>{const o=document.createElement("option");o.value=ch.name;o.textContent=ch.name;sel.append(o);});
+  (found?.chapters||[]).filter(ch=>ch.included!==false).forEach(ch=>{const o=document.createElement("option");o.value=ch.name;o.textContent=ch.name;sel.append(o);});
 }
 $("revisionSubject").addEventListener("change",populateRevisionChapters);
 $("revisionForm").addEventListener("submit",e=>{
