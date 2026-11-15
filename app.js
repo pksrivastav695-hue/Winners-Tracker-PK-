@@ -637,7 +637,7 @@ function checkDailyReminder(){
 }
 setInterval(checkDailyReminder,30000);
 $("exportData").addEventListener("click",()=>{
-  const data={backupVersion:2,exportedAt:new Date().toISOString(),profile,subjects,exams,dailyTasks,revisions,notices,guild:selectedGuild};
+  const data={backupVersion:2,exportedAt:new Date().toISOString(),profile,subjects,exams,dailyTasks,revisions,notices,guild:selectedGuild,preferences:{lightMode:document.body.classList.contains("light-mode"),reminderEnabled:localStorage.getItem("wtReminderEnabled")==="true",reminderTime:localStorage.getItem("wtReminderTime")||"19:00"}};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob);
   const a=document.createElement("a");a.href=url;a.download="winners-tracker-backup.json";a.click();URL.revokeObjectURL(url);notify("Backup exported.");
 });
@@ -657,13 +657,13 @@ $("importDataFile").addEventListener("change", async () => {
     localStorage.setItem("wtProfile", JSON.stringify(profile)); localStorage.setItem("subjects", JSON.stringify(subjects));
     localStorage.setItem("wtExams", JSON.stringify(exams)); localStorage.setItem("wtDailyTasks", JSON.stringify(dailyTasks));
     localStorage.setItem("wtRevisions", JSON.stringify(revisions)); localStorage.setItem("wtNotifications", JSON.stringify(notices));
-    localStorage.setItem("wtGuild", selectedGuild); location.reload();
+    localStorage.setItem("wtGuild", selectedGuild);\n    if(data.preferences){localStorage.setItem("wtLight",String(!!data.preferences.lightMode));localStorage.setItem("wtReminderEnabled",String(!!data.preferences.reminderEnabled));if(data.preferences.reminderTime)localStorage.setItem("wtReminderTime",data.preferences.reminderTime);}\n    location.reload();
   } catch (error) { notify(error.message || "Could not read that backup."); }
   finally { $("importDataFile").value = ""; }
 });
 $("resetData").addEventListener("click",()=>{
   if(!confirm("This will permanently clear this browser's Winners Tracker data. Export a backup first if needed. Continue?"))return;
-  ["wtProfile","subjects","wtExams","wtDailyTasks","wtRevisions","wtNotifications","wtGuild","wtThoughtBag","wtLastThought","wtReminderEnabled","wtReminderTime","wtReminderSent"].forEach(k=>localStorage.removeItem(k));
+  ["wtProfile","subjects","wtExams","wtDailyTasks","wtRevisions","wtNotifications","wtGuild","wtThoughtBag","wtLastThought","wtReminderEnabled","wtReminderTime","wtReminderSent","wtTimerEndAt","wtTimerRemaining","wtTimerPreset","wtLight"].forEach(k=>localStorage.removeItem(k));
   location.reload();
 });
 updateNotificationBadge();
