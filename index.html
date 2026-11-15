@@ -19,7 +19,10 @@
       <p class="eyebrow">YOUR PERSONAL STUDY HALL</p>
       <h1>Winners Tracker</h1>
       <p class="muted">Set up your study space. You can change these details later.</p>
+      <div class="setup-progress"><span id="setupProgressOne" class="setup-progress-step active">01 <small>Profile</small></span><i></i><span id="setupProgressTwo" class="setup-progress-step">02 <small>Study plan</small></span></div>
       <form id="loginForm">
+        <div class="setup-step" id="setupStep1">
+          <div class="setup-step-heading"><p class="eyebrow">STEP 01 / 02</p><h2>Student profile</h2><p class="muted">Your class and board decide which syllabus catalogue can be loaded.</p></div>
         <div class="setup-grid">
           <div class="setup-field"><label for="loginName">Student name</label><input id="loginName" autocomplete="name" placeholder="Your name" required></div>
           <div class="setup-field"><label for="loginClass">Class</label><select id="loginClass" required><option value="">Select class</option><option value="6">Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option></select></div>
@@ -28,10 +31,14 @@
           <div class="setup-field" id="stateField" hidden><label for="studentState">State</label><select id="studentState"> <option value="">Select state</option><option value="Andhra Pradesh">Andhra Pradesh</option><option value="Arunachal Pradesh">Arunachal Pradesh</option><option value="Assam">Assam</option><option value="Bihar">Bihar</option><option value="Chhattisgarh">Chhattisgarh</option><option value="Goa">Goa</option><option value="Gujarat">Gujarat</option><option value="Haryana">Haryana</option><option value="Himachal Pradesh">Himachal Pradesh</option><option value="Jharkhand">Jharkhand</option><option value="Karnataka">Karnataka</option><option value="Kerala">Kerala</option><option value="Madhya Pradesh">Madhya Pradesh</option><option value="Maharashtra">Maharashtra</option><option value="Manipur">Manipur</option><option value="Meghalaya">Meghalaya</option><option value="Mizoram">Mizoram</option><option value="Nagaland">Nagaland</option><option value="Odisha">Odisha</option><option value="Punjab">Punjab</option><option value="Rajasthan">Rajasthan</option><option value="Sikkim">Sikkim</option><option value="Tamil Nadu">Tamil Nadu</option><option value="Telangana">Telangana</option><option value="Tripura">Tripura</option><option value="Uttar Pradesh">Uttar Pradesh</option><option value="Uttarakhand">Uttarakhand</option><option value="West Bengal">West Bengal</option></select></div>
           <div class="setup-field" id="streamField" hidden><label for="studentStream">Class 11–12 stream</label><select id="studentStream"><option value="">Choose stream</option><option value="PCM">Science - PCM</option><option value="PCB">Science - PCB</option><option value="PCMB">Science - PCMB</option><option value="Commerce">Commerce</option><option value="Humanities">Humanities / Arts</option></select></div>
         </div>
+        </div>
+        <div class="setup-step" id="setupStep2" hidden>
+          <div class="setup-step-heading"><p class="eyebrow">STEP 02 / 02</p><h2>Your study plan</h2><p class="muted">Choose how you want to use your study space.</p></div>
         <div class="setup-field"><label>Contact details <span class="field-note">OTP sign-in will be connected after Firebase setup</span></label><input id="studentPhone" type="tel" inputmode="tel" placeholder="Phone number (optional)"><input id="studentEmail" type="email" placeholder="Email address (optional)"></div>
         <div class="setup-field"><label>Choose your study modes</label><div class="mode-choices"><label><input type="checkbox" id="dailyMode" checked> Daily Study</label><label><input type="checkbox" id="examMode"> Exam Preparation</label></div><p class="field-note">You can use either mode or both. You can change this later.</p></div>
         <div class="setup-field" id="targetExamField" hidden><label for="targetExamDate">Target exam date (optional)</label><input id="targetExamDate" type="date"></div>
-        <button class="primary-btn full-btn" type="submit">Create my study space <span>✦</span></button>
+        </div>
+        <div class="setup-navigation"><button id="setupBack" class="secondary-btn" type="button" hidden>← Back</button><button id="setupNext" class="primary-btn" type="button">Continue →</button><button id="setupCreate" class="primary-btn full-btn" type="submit" hidden>Create my study space <span>✦</span></button></div>
       </form>
       <p class="tiny-note">This first version saves your profile on this device. OTP authentication is not active yet.</p>
     </div>
