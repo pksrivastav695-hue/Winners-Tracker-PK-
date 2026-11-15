@@ -25,7 +25,11 @@ function saveExams() {
   renderExams();
   updateDashboard();
 }
-function getSyllabusData(profileData) {\n  if (profileData?.board === "State Board") return window.WT_SYLLABUS?.data?.["State Board"]?.[profileData.state]?.[String(profileData.studentClass)];\n  return window.WT_SYLLABUS?.data?.[profileData?.board]?.[String(profileData?.studentClass)];\n}\nfunction syllabusSource(profileData) {
+function getSyllabusData(profileData) {
+  if (profileData?.board === "State Board") return window.WT_SYLLABUS?.data?.["State Board"]?.[profileData.state]?.[String(profileData.studentClass)];
+  return window.WT_SYLLABUS?.data?.[profileData?.board]?.[String(profileData?.studentClass)];
+}
+function syllabusSource(profileData) {
   if (profileData?.board === "CBSE") return window.WT_SYLLABUS?.sources?.CBSE;
   if (profileData?.board === "CISCE") return Number(profileData.studentClass) === 12 ? window.WT_SYLLABUS?.sources?.CISCE_ISC : window.WT_SYLLABUS?.sources?.CISCE_ICSE;
   if (profileData?.board === "State Board" && profileData?.state === "Uttar Pradesh") return window.WT_SYLLABUS?.sources?.UPMSP;
