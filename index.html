@@ -110,6 +110,7 @@
         <div class="section-intro"><div><p class="eyebrow">YOUR DAILY QUEST</p><h1>Daily Study</h1><p class="muted">Set today's targets and mark each one when it is complete.</p></div></div>
         <section class="panel daily-panel">
           <div class="panel-heading"><div><p class="eyebrow">TODAY'S PLAN</p><h3>Study targets</h3></div><span class="count-pill" id="dailyCount">0 targets</span></div>
+          <div class="auto-plan-controls"><div><strong>Automatic chapter planner</strong><p class="muted">Targets come from selected, unfinished chapters. Completing a target updates syllabus progress automatically.</p></div><label>Chapters per day<select id="dailyChapterLimit"><option value="1">1 chapter</option><option value="2">2 chapters</option><option value="3">3 chapters</option><option value="4">4 chapters</option><option value="5">5 chapters</option><option value="6">6 chapters</option><option value="8">8 chapters</option></select></label><button id="generateDailyPlan" class="primary-btn" type="button">Generate today's plan</button></div>
           <form id="dailyForm" class="daily-form"><input id="dailyTask" placeholder="Add a target (e.g. Revise Light chapter)" required><select id="dailySubject"><option value="">Subject (optional)</option></select><button class="primary-btn" type="submit">+ Add target</button></form>
           <div id="dailyTasks" class="daily-tasks"><p class="empty-state">No targets yet. Add the first small task.</p></div>
         </section>
@@ -122,11 +123,11 @@
           <article class="stat-card"><span class="stat-icon">▤</span><p>SYLLABUS COMPLETE</p><strong id="prepProgress">0%</strong><small id="prepChapters">0 of 0 chapters</small></article>
           <article class="stat-card"><span class="stat-icon">✦</span><p>UPCOMING PAPERS</p><strong id="prepExamCount">0</strong><small>in your datesheet</small></article>
         </div>
-        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">YOUR NEXT STEP</p><h3>Preparation checklist</h3></div><button class="text-btn" data-go="syllabus">Open syllabus →</button></div><p class="muted prep-hint">Complete chapters in the Syllabus Tracker and add every paper in the Exam Datesheet. This page brings that progress together.</p><button class="primary-btn" data-go="exams">Open exam datesheet</button></section>
+        <section class="panel"><div class="panel-heading"><div><p class="eyebrow">YOUR NEXT STEP</p><h3>Preparation checklist</h3></div><button class="text-btn" data-go="syllabus">Open syllabus →</button></div><p class="muted prep-hint">Your selected syllabus, completed chapters, daily targets and exam datesheet all feed into this progress. The next unfinished chapters are added to your daily plan.</p><button class="primary-btn" data-go="exams">Open exam datesheet</button></section>
       </section>
 
       <section id="syllabusPage" class="page hidden">
-        <div class="section-intro"><div><p class="eyebrow">ONE TOPIC AT A TIME</p><h1>Your syllabus</h1><p class="muted">Add subjects, add chapters, and mark them complete as you learn.</p></div></div>
+        <div class="section-intro"><div><p class="eyebrow">ONE TOPIC AT A TIME</p><h1>Your syllabus</h1><p class="muted">Your board-wise subject and chapter catalogue appears here. Select only the chapters your school is teaching, then track completion.</p></div></div>
         <section class="panel syllabus-tools">
           <div class="syllabus-tools-head"><div><p class="eyebrow">BOARD-ALIGNED CURRICULUM</p><h3 id="syllabusStatusTitle">Checking your syllabus…</h3><p id="syllabusStatusText" class="muted">Your board, class and academic session determine the syllabus.</p></div><span class="syllabus-seal">▤</span></div>
           <div class="syllabus-tools-actions"><button id="syncSyllabusBtn" class="primary-btn" type="button">Load / refresh syllabus</button><a id="syllabusSourceLink" class="source-link" href="https://cbseacademic.nic.in/curriculum_2027.html" target="_blank" rel="noopener">Official board source ↗</a></div>
